@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">WayFare</string>
+    <string name="red">Red</string>
+    <string name="blue">Blue</string>
+    <string name="green">Green</string>
+
+    <string name="text_favorites">text_favorites</string>
+    <string name="text_schedules">text_schedules</string>
+    <string name="text_music">text_music</string>
+</resources>
