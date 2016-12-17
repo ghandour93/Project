@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -17,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -32,6 +34,10 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,10 +73,11 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
     private static Toolbar toolbar;
     private TextView name;
     private TextView location;
-    private static SimpleDraweeView avatar;
+    private SimpleDraweeView avatar;
     private RelativeLayout relativelay;
     private TextView following;
     private TextView followers;
+    private RelativeLayout relativeprof;
     JSONObject profile = null;
     boolean bool;
 
@@ -96,6 +103,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
     Bundle c;
 
 
+
     /**
      * Find the Views in the layout
      * Auto-created on 2016-03-03 11:32:38 by Android Layout Finder
@@ -111,12 +119,14 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         name = (TextView) findViewById(R.id.name);
         location = (TextView) findViewById(R.id.location);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        avatar = (SimpleDraweeView) findViewById(R.id.avatar);
 //        textviewTitle = (TextView)findViewById( R.id.main_textview_title);
 //        textviewSubtitle= (TextView) findViewById(R.id.main_textview_subtitle);
-        avatar = (SimpleDraweeView) findViewById(R.id.avatar);
+
         relativelay = (RelativeLayout) findViewById(R.id.relativelay);
         following = (TextView) findViewById(R.id.following);
         followers = (TextView) findViewById(R.id.followers);
+        relativeprof = (RelativeLayout) findViewById(R.id.relativeprof);
 
     }
 
@@ -139,30 +149,34 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         viewPager.setAdapter(new CustomPagerAdapter(this));
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
         toolbar.setTitle("");
         appbar.addOnOffsetChangedListener(this);
         b = new Bundle();
-        bool=false;
+        bool = false;
 
         setSupportActionBar(toolbar);
 //        startAlphaAnimation(textviewTitle, 0, View.INVISIBLE);
 //        startAlphaAnimation(textviewSubtitle, 0, View.INVISIBLE);
 //        startAlphaAnimation(toolbar, 0, View.INVISIBLE);
 //        startAlphaAnimation(lineartoolbar, 0, View.INVISIBLE);
+
         ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithResourceId(R.drawable.ic_launcher).build();
         avatar.setImageURI(imageRequest.getSourceUri());
+
         //noinspection ResourceType
 //        avatar.setTranslationY(-240);
 //        avatar.setX(100);
 //        avatar.setY(300);
 
         //set avatar and cover
-        c=getIntent().getExtras();
-        if (c!=null)
+        c = getIntent().getExtras();
+        if (c != null)
             bool = c.containsKey("notmine");
         new AsyncTask<String, Void, Intent>() {
 
             ServerTask s = new ServerTask(Profile.this);
+
             @Override
             protected Intent doInBackground(String... params) {
 
@@ -172,8 +186,9 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
                 try {
                     if (bool) {
                         profile = s.getProfile(c.getString("userprofile"));
-                    }else{
-                    profile = s.getProfile("qoqo");}
+                    } else {
+                        profile = s.getProfile("qoqo");
+                    }
 
                 } catch (Exception e) {
 
@@ -182,7 +197,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
             }
         }.execute();
         Log.i("profile", String.valueOf(profile));
-        while(true) {
+        while (true) {
             if (profile != null) {
                 loadProfileData(profile);
                 break;
@@ -209,16 +224,26 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         });
     }
 
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        Fresco.initialize(this);
+        ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithResourceId(R.drawable.ic_launcher).build();
+        avatar.setImageURI(imageRequest.getSourceUri());
+        appbar.addOnOffsetChangedListener(this);
+    }
+
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
         float maxScroll = appBarLayout.getTotalScrollRange();
         float percentage = (float) Math.abs(offset) / maxScroll;
-        Log.d("mah", String.valueOf(percentage));
-        Log.d("gety", String.valueOf(avatar.getY()));
-        Log.d("getx", String.valueOf(avatar.getX()));
+
+//        Log.d("mah", String.valueOf(percentage));
+//        Log.d("gety", String.valueOf(avatar.getY()));
+//        Log.d("getx", String.valueOf(avatar.getX()));
         ScaleText(name, location, percentage);
-        ImageAnimation(1f - percentage, Math.abs(offset));
+        ImageAnimation(avatar,1f - percentage, Math.abs(offset));
         TextAnimation1(name, 1f - percentage, Math.abs(offset));
         TextAnimation2(location, 1f - percentage, Math.abs(offset));
 //        handleAlphaOnTitle(percentage);
@@ -228,44 +253,11 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
 
     }
 
-    private void handleToolbarTitleVisibility(float percentage) {
-        if (percentage >= PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR) {
-
-            if (!mIsTheTitleVisible) {
-//                startAlphaAnimation(textviewTitle, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
-//                startAlphaAnimation(textviewSubtitle, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
-                mIsTheTitleVisible = true;
-            }
-
-        } else {
-
-            if (mIsTheTitleVisible) {
-//                startAlphaAnimation(textviewTitle, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
-//                startAlphaAnimation(textviewSubtitle, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
-                mIsTheTitleVisible = false;
-            }
-        }
-        if (percentage >= 0.7333333333) {
-
-            if (!mIsToolBarVisible) {
-//                startAlphaAnimation(lineartoolbar, 0, View.VISIBLE);
-                mIsToolBarVisible = true;
-            }
-
-        } else {
-
-            if (mIsToolBarVisible) {
-//                startAlphaAnimation(lineartoolbar, 0, View.INVISIBLE);
-                mIsToolBarVisible = false;
-            }
-
-        }
-    }
 
     private void ScaleText(TextView textView1, TextView textView2, float percentage) {
         if (percentage >= PERCENTAGE_TO_HIDE_TITLE_DETAILS) {
             if (mIsTheTitleContainerVisible) {
-                ScaleAnimation scaleAnimation = new ScaleAnimation(1f, 0.88f, 1f, 0.88f, textView1.getWidth()/2, textView1.getHeight()/2);
+                ScaleAnimation scaleAnimation = new ScaleAnimation(1f, 0.88f, 1f, 0.88f, textView1.getWidth() / 2, textView1.getHeight() / 2);
                 scaleAnimation.setDuration(ALPHA_ANIMATIONS_DURATION);
                 scaleAnimation.setFillAfter(true);
                 startAlphaAnimation(relativelay, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
@@ -277,7 +269,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         } else {
 
             if (!mIsTheTitleContainerVisible) {
-                ScaleAnimation scaleAnimation = new ScaleAnimation(0.88f, 1f, 0.88f, 1f, textView1.getWidth()/2, textView1.getHeight()/2);
+                ScaleAnimation scaleAnimation = new ScaleAnimation(0.88f, 1f, 0.88f, 1f, textView1.getWidth() / 2, textView1.getHeight() / 2);
                 scaleAnimation.setDuration(ALPHA_ANIMATIONS_DURATION);
                 scaleAnimation.setFillAfter(true);
                 startAlphaAnimation(relativelay, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
@@ -326,7 +318,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
             //noinspection ResourceType
             textView.setTranslationY(dist);
 //            textView.setX(mStartXPosition1 - distanceXToSubtract);
-            Log.d("q",String.valueOf(q));
+            Log.d("q", String.valueOf(q));
             m = expandedPercentageFactor;
 
         }
@@ -343,19 +335,17 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
 //            textView.setX(mStartXPosition2 - distanceXToSubtract);
 //            if(expandedPercentageFactor<0.5){
 //                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            Log.d("q",String.valueOf(q));
+            Log.d("q", String.valueOf(q));
             n = expandedPercentageFactor;
 
         }
     }
 
-    public void ImageAnimation(float expandedPercentageFactor, float dist) {
+    public void ImageAnimation(SimpleDraweeView avatar, float expandedPercentageFactor, float dist) {
         InitPropertiesImage(avatar, dist);
         Log.d("ramy", "ramy");
         if (expandedPercentageFactor <= 1 && expandedPercentageFactor != z) {
             Log.d("ramy", "ramy");
-            float distanceYToSubtract = ((mStartYPosition - mFinalYPosition)
-                    * (1f - expandedPercentageFactor)) + (avatar.getHeight() / 2) - dist;
 
             float distanceXToSubtract = ((mStartXPosition - mFinalXPosition)
                     * (1f - expandedPercentageFactor)) + (avatar.getWidth() / 2);
@@ -368,7 +358,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
             Log.d("setX", String.valueOf(mStartXPosition - distanceXToSubtract));
             Log.d("setY", String.valueOf(q));
 
-            CollapsingToolbarLayout.LayoutParams lp = (CollapsingToolbarLayout.LayoutParams) avatar.getLayoutParams();
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) avatar.getLayoutParams();
             lp.width = (int) (mStartHeight - heightToSubtract);
             lp.height = (int) (mStartHeight - heightToSubtract);
             avatar.setLayoutParams(lp);
@@ -379,17 +369,12 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
 
     @SuppressLint("PrivateResource")
     private void InitPropertiesImage(SimpleDraweeView child, float dist) {
-//        toolbar = (Toolbar)((CoordinatorLayout)child.getParent()).getChildAt()
         if (mStartYPosition == 0)
             mStartYPosition = (int) (child.getY());
-//            child.setY(child.getY()+dist);}
         Log.d("StartYPos", String.valueOf(mStartYPosition));
-//            mStartYPosition = (int) (dependency.getY());
-
         if (mFinalYPosition == 0)
             mFinalYPosition = (child.getHeight() / 2);
         Log.d("FinalYPos", String.valueOf(mFinalYPosition));
-//            mFinalYPosition = (dependency.getHeight() /2);
 
         if (mStartHeight == 0)
             mStartHeight = child.getHeight();
@@ -401,7 +386,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
             mStartXPosition = (int) (child.getX() + (child.getWidth() / 2));
 
 //        if (mFinalXPosition == 0)
-            mFinalXPosition = context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (finalHeight / 2);
+        mFinalXPosition = context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (finalHeight / 2);
 
         if (mStartToolbarPosition == 0)
             mStartToolbarPosition = child.getY() + (child.getHeight() / 2);
@@ -420,7 +405,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
             mStartXPosition1 = (int) (child.getX() + (child.getWidth() / 2));
 
         if (mFinalXPosition1 == 0)
-            mFinalXPosition1=((LinearLayout)child.getParent()).getWidth()-(context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (child.getWidth()/2));
+            mFinalXPosition1 = ((LinearLayout) child.getParent()).getWidth() - (context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (child.getWidth() / 2));
     }
 
     private void InitPropertiesText2(TextView child) {
@@ -432,8 +417,8 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         if (mStartXPosition2 == 0)
             mStartXPosition2 = (int) (child.getX() + (child.getWidth() / 2));
 //        mFinalXPosition2=((LinearLayout)child.getParent()).getWidth()-context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material);
-        if (mFinalXPosition2==0)
-            mFinalXPosition2=((LinearLayout)child.getParent()).getWidth()-(context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (child.getWidth()/2));
+        if (mFinalXPosition2 == 0)
+            mFinalXPosition2 = ((LinearLayout) child.getParent()).getWidth() - (context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (child.getWidth() / 2));
 //            Log.d("finalx", String.valueOf(mFinalXPosition2));
     }
 
@@ -447,26 +432,24 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         return result;
     }
 
-    public void loadProfileData(JSONObject obj){
+    public void loadProfileData(JSONObject obj) {
         try {
             String username = obj.getString("user");
             String location1 = obj.getString("location");
             name.setText(username);
             location.setText(location1);
-            following.setText("Following: " + obj.getString("following_count"));
-            followers.setText("Followers: " + obj.getString("followers_count"));
+            following.setText(obj.getString("following_count"));
+            followers.setText(obj.getString("followers_count"));
             JSONArray x = obj.getJSONArray("following");
             JSONArray y = obj.getJSONArray("followers");
             int length = x.length();
             ArrayList<String> followinglist = new ArrayList<>(length);
-            for (int i = 0; i < length; i++)
-            {
+            for (int i = 0; i < length; i++) {
                 followinglist.add(x.getString(i));
             }
             length = y.length();
             ArrayList<String> followerslist = new ArrayList<>(length);
-            for (int i = 0; i < length; i++)
-            {
+            for (int i = 0; i < length; i++) {
                 followerslist.add(y.getString(i));
             }
             b.putStringArrayList("following", followinglist);
@@ -475,4 +458,5 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
             e.printStackTrace();
         }
     }
+
 }
