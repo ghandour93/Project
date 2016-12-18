@@ -5,47 +5,79 @@ package com.example.ramy.wayfare;
  */
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class CustomPagerAdapter extends PagerAdapter {
+public class CustomPagerAdapter extends FragmentPagerAdapter {
 
-    private Context mContext;
-
-    public CustomPagerAdapter(Context context) {
-        mContext = context;
-    }
-
-    @Override
-    public Object instantiateItem(ViewGroup collection, int position) {
-        ModelObject modelObject = ModelObject.values()[position];
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        ViewGroup layout = (ViewGroup) inflater.inflate(modelObject.getLayoutResId(), collection, false);
-        collection.addView(layout);
-        return layout;
-    }
-
-    @Override
-    public void destroyItem(ViewGroup collection, int position, Object view) {
-        collection.removeView((View) view);
+    public CustomPagerAdapter(FragmentManager fm) {
+        super(fm);
     }
 
     @Override
     public int getCount() {
-        return ModelObject.values().length;
+        return 3;
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view == object;
+    public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return new fragmentOne();
+                case 1:
+                    return new Trial();
+                case 2:
+                    return new Trial();
+                default:
+                    return new Profile1();
+            }
     }
+
 
     @Override
     public CharSequence getPageTitle(int position) {
-        ModelObject customPagerEnum = ModelObject.values()[position];
-        return mContext.getString(customPagerEnum.getTitleResId());
+        switch(position)
+        {
+            case 0: return "Feed";
+            case 1: return "Ramy";
+            case 2: return "Yahia";
+            default : return "Feed";
+        }
     }
-
 }
+
+//    @Override
+//    public Object instantiateItem(ViewGroup collection, int position) {
+//        ModelObject modelObject = ModelObject.values()[position];
+//        LayoutInflater inflater = LayoutInflater.from(mContext);
+//        ViewGroup layout = (ViewGroup) inflater.inflate(modelObject.getLayoutResId(), collection, false);
+//        collection.addView(layout);
+//        return layout;
+//    }
+//
+//    @Override
+//    public void destroyItem(ViewGroup collection, int position, Object view) {
+//        collection.removeView((View) view);
+//    }
+//
+//    @Override
+//    public int getCount() {
+//        return ModelObject.values().length;
+//    }
+//
+//    @Override
+//    public boolean isViewFromObject(View view, Object object) {
+//        return view == object;
+//    }
+//
+//    @Override
+//    public CharSequence getPageTitle(int position) {
+//        ModelObject customPagerEnum = ModelObject.values()[position];
+//        return mContext.getString(customPagerEnum.getTitleResId());
+//    }

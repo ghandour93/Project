@@ -6,6 +6,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,17 +16,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 public class MainActivity1 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
+        Fresco.initialize(this);
 
-//        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-//        PagerAdapter pagerAdapter =
-//                new PagerAdapter(getSupportFragmentManager(), MainActivity.this);
-//        viewPager.setAdapter(pagerAdapter);
         Fragment fragment1 = null;
         Class fragmentClass = fragmentOne.class;
         try {
@@ -34,7 +34,10 @@ public class MainActivity1 extends AppCompatActivity {
             e.printStackTrace();
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.frame, fragment1).commit();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame, fragment1).addToBackStack(null);
+        fragmentTransaction.commit();
+        fragmentTransaction.addToBackStack(null);
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)
                 findViewById(R.id.bottom_navigation);
@@ -76,48 +79,23 @@ public class MainActivity1 extends AppCompatActivity {
 
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame, fragment).addToBackStack(null);
+        fragmentTransaction.commit();
+        fragmentTransaction.addToBackStack(null);
 
         // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);
     }
 
-//    class PagerAdapter extends FragmentPagerAdapter {
-//
-////        String tabTitles[] = new String[]{"Tab One", "Tab Two", "Tab Three"};
-//        Context context;
-//
-//        public PagerAdapter(FragmentManager fm, Context context) {
-//            super(fm);
-//            this.context = context;
-//        }
-//
-//        @Override
-//        public int getCount() {
-////            return tabTitles.length;
-//            return 3;
-//        }
-//
-//        @Override
-//        public Fragment getItem(int position) {
-//
-//            switch (position) {
-//                case 0:
-//                    return new fragmentOne();
-//                case 1:
-//                    return new fragmentOne();
-//                case 2:
-//                    return new fragmentOne();
-//            }
-//
-//            return null;        }
-//
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            // Generate title based on item position
-////            return tabTitles[position];
-//            return null;
-//        }
-//
-//    }
+    @Override
+    public void onBackPressed() {
+        if(getFragmentManager().getBackStackEntryCount() == 1) {
+            moveTaskToBack(false);
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
+
 }

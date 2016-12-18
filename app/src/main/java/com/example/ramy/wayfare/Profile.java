@@ -10,9 +10,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +24,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.ScaleAnimation;
@@ -79,6 +84,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
     private TextView followers;
     private RelativeLayout relativeprof;
     JSONObject profile = null;
+    private Fragment currentFrag;
     boolean bool;
 
     private static int mStartYPosition;
@@ -146,7 +152,7 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         tabLayout.addTab(tabLayout.newTab().setText("Tab 3"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new CustomPagerAdapter(this));
+        viewPager.setAdapter(new CustomPagerAdapter(this.getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
@@ -163,6 +169,29 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
 
         ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithResourceId(R.drawable.ic_launcher).build();
         avatar.setImageURI(imageRequest.getSourceUri());
+
+        Fragment fragment1 = null;
+        Class fragmentClass = fragmentOne.class;
+        try {
+            fragment1 = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        currentFrag = fragment1;
+        fragmentManager.beginTransaction().replace(R.id.coord, fragment1).commit();
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView)
+                findViewById(R.id.bottom_navigation);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        selectDrawerItem(item);
+                        return true;
+                    }
+                });
 
         //noinspection ResourceType
 //        avatar.setTranslationY(-240);
@@ -224,13 +253,40 @@ public class Profile extends AppCompatActivity implements AppBarLayout.OnOffsetC
         });
     }
 
-    @Override
-    protected void onRestart(){
-        super.onRestart();
-        Fresco.initialize(this);
-        ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithResourceId(R.drawable.ic_launcher).build();
-        avatar.setImageURI(imageRequest.getSourceUri());
-        appbar.addOnOffsetChangedListener(this);
+    public void selectDrawerItem(MenuItem menuItem) {
+        // Create a new fragment and specify the fragment to show based on nav item clicked
+        Fragment fragment = null;
+        Class fragmentClass = null;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        switch (menuItem.getItemId()) {
+            case R.id.action_favorites:
+
+                fragmentClass = fragmentOne.class;
+                break;
+            case R.id.action_schedules:
+                break;
+            case R.id.action_music:
+                fragmentClass = fragmentOne.class;
+                break;
+            default:
+                fragmentClass = fragmentOne.class;
+        }
+            if (fragmentClass !=null) {
+                try {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // Insert the fragment by replacing any existing fragment
+                fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+                currentFrag = fragment;
+            }else if (currentFrag !=null){
+                fragmentManager.beginTransaction().remove(currentFrag).commit();
+                currentFrag = null;
+            }
+        // Highlight the selected item has been done by NavigationView
+        menuItem.setChecked(true);
     }
 
 
