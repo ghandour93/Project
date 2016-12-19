@@ -1,12 +1,18 @@
 package com.example.ramy.wayfare;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,9 +20,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,29 +29,24 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
 
 public class ServerTask extends AsyncTask<String,Void,String> {
-    Context context;
-    AlertDialog alertDialog;
-    String fetch_url = "http://10.0.2.2:8000/auth/me/";
-    String user_url = "http://10.0.2.2:8000/auth/register/";
-    String login_url = "http://10.0.2.2:8000/auth/login/";
-    String image_url = "http://10.0.2.2:8000/user/imageup/";
-    String check_url = "http://10.0.2.2:8000/final/simplecheck/";
-    String profile_url = "http://10.0.2.2:8000/final/getProfile/";
-    String imageup_url = "http://10.0.2.2:8000/final/uploadImage/";
-    String getfeed_url="http://10.0.2.2:8000/final/getFeed/";
+
+    static Context context;
+    private AlertDialog alertDialog;
+    private String fetch_url = "http://10.0.2.2:8000/auth/me/";
+    private String user_url = "http://10.0.2.2:8000/auth/register/";
+    private String login_url = "http://10.0.2.2:8000/auth/login/";
+    private String image_url = "http://10.0.2.2:8000/user/imageup/";
+    private String check_url = "http://10.0.2.2:8000/final/simplecheck/";
+    private String profile_url = "http://10.0.2.2:8000/final/getProfile/";
+    private String imageup_url = "http://10.0.2.2:8000/final/uploadImage/";
+    private String getfeed_url="http://10.0.2.2:8000/final/getFeed/";
     String result="";
     public static final String LOG_TAG = "myLogs";
     public String auth_token="";
+    private Account[] mAccount;
 
     ServerTask(Context ctx) {
         context = ctx;
@@ -344,4 +343,65 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         }
         return null;
     }
+
+    public static Account getStoredAccount(String c) { //send ApplicationContext as a parameter
+        Account[] accounts = null;
+        String accountname = c;
+        AccountManager accountManager = AccountManager.get(context);
+        Account account = null;
+        if(accountname != null) {
+            Log.e("yahia","yahia");
+            try {
+            accounts = accountManager.getAccountsByType("com.example.ramy.myapplication");
+            } catch (SecurityException e) {
+                Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
+            }
+            for(Account a : accounts) {
+                Log.e("yahia",a.name.toString());
+
+                if(a.name.toString().equalsIgnoreCase(accountname)) {
+                    Log.e("yahia","yahia123");
+                    account = a;
+                }
+            }
+            }
+        return account;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static String getAuthToken(AccountManager a, String c) {
+
+        final AccountManager accountManager = a;
+        AccountManagerFuture<Bundle> future = accountManager.getAuthToken(getStoredAccount(c),
+                AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, true, null, null);
+        Bundle result = null;
+        try {
+            Log.e("yahia", "samir el bedan");
+            result = future.getResult();
+            Log.e("yahia", result.toString());
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
+            toast.show();
+        }
+        String authToken = null;
+        Log.e("yahia", "samir el bedan2");
+        if (future.isDone() && !future.isCancelled()) {
+            Log.e("yahia", "samir el bedan3");
+            if (result.containsKey(AccountManager.KEY_INTENT)) {
+                Log.e("yahia", "samir el bedan4");
+                Intent intent = result.getParcelable(AccountManager.KEY_INTENT);
+            }
+            Log.e("yahia", "samir el bedan5");
+            authToken = result.getString(AccountManager.KEY_AUTHTOKEN);
+        }
+        Log.e("yahia", "samir el bedan6");
+        if (authToken == null) {
+            Log.e("yahia", "samir el bedan7");
+            Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
+            toast.show();
+        }
+
+        return authToken;
+    }
+
 }

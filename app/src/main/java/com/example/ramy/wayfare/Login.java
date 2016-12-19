@@ -6,11 +6,9 @@ import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -30,12 +28,12 @@ public class Login extends AccountAuthenticatorActivity {
     public static final String KEY_ERROR_MESSAGE = "ERR_MSG";
 
     public final static String PARAM_USER_PASS = "USER_PASS";
-
+    public static String  accountName = null;
     private final int REQ_SIGNUP = 1;
 
     private final String TAG = this.getClass().getSimpleName();
 
-    private AccountManager mAccountManager;
+    public static AccountManager mAccountManager;
     private String mAuthTokenType;
 
     /**
@@ -111,6 +109,13 @@ public class Login extends AccountAuthenticatorActivity {
                     data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
                     data.putString(PARAM_USER_PASS, userPass);
 
+                    String y = ServerTask.getAuthToken(mAccountManager, userName);
+                    Log.w("TOKEN", y);
+
+
+
+
+
                 } catch (Exception e) {
                     data.putString(KEY_ERROR_MESSAGE, e.getMessage());
                 }
@@ -125,6 +130,7 @@ public class Login extends AccountAuthenticatorActivity {
                 if (intent.hasExtra(KEY_ERROR_MESSAGE)) {
                     Toast.makeText(getBaseContext(), intent.getStringExtra(KEY_ERROR_MESSAGE), Toast.LENGTH_SHORT).show();
                 } else {
+
                     finishLogin(intent);
                 }
             }
@@ -134,7 +140,8 @@ public class Login extends AccountAuthenticatorActivity {
     private void finishLogin(Intent intent) {
         Log.d("udinic", TAG + "> finishLogin");
 
-        String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+        accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+
         Log.d("udinic", TAG + accountName);
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
         Log.d("udinic", TAG + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
@@ -147,6 +154,7 @@ public class Login extends AccountAuthenticatorActivity {
 
             // Creating the account on the device and setting the auth token we got
             // (Not setting the auth token will cause another call to the server to authenticate the user)
+
             mAccountManager.addAccountExplicitly(account, accountPassword, null);
             mAccountManager.setAuthToken(account, authtokenType, authtoken);
         } else {
