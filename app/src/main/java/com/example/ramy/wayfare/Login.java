@@ -110,7 +110,7 @@ public class Login extends AccountAuthenticatorActivity {
                     data.putString(PARAM_USER_PASS, userPass);
 
                     String y = ServerTask.getAuthToken(mAccountManager, userName);
-                    Log.w("TOKEN", y);
+                    Log.w("TOKEN", y);//
 
 
 

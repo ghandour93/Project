@@ -370,7 +370,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
 
     @SuppressWarnings("deprecation")
     public static String getAuthToken(AccountManager a, String c) {
-
+//yahia
         final AccountManager accountManager = a;
         AccountManagerFuture<Bundle> future = accountManager.getAuthToken(getStoredAccount(c),
                 AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, true, null, null);
