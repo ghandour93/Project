@@ -1,6 +1,10 @@
 package com.example.ramy.wayfare;
 
-import android.accounts.*;
+import android.accounts.AbstractAccountAuthenticator;
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
+import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -68,18 +72,17 @@ public class UdinicAuthenticator extends AbstractAccountAuthenticator {
         Log.d("udinic", TAG + "> peekAuthToken returned - " + authToken);
 
         // Lets give another try to authenticate the user
-      /*  if (TextUtils.isEmpty(authToken)) {
-            final String password = am.getPassword(account);
-            if (password != null) {
-                try {
-                    Log.d("udinic", TAG + "> re-authenticating with the existing password");
-                    ServerTask serverTask = new ServerTask(UdinicAuthenticator.this);
-                    authToken = ServerTask.UserSignIn(account.name, password, authTokenType);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }*/
+//        if (TextUtils.isEmpty(authToken)) {
+//            final String password = am.getPassword(account);
+//            if (password != null) {
+//                try {
+//                    Login l = new Login();
+//                  authToken = l.get(password);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 
         // If we get an authToken - we return it
         if (!TextUtils.isEmpty(authToken)) {

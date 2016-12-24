@@ -3,6 +3,7 @@ package com.example.ramy.wayfare;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,11 +30,13 @@ public class Login extends AccountAuthenticatorActivity {
 
     public final static String PARAM_USER_PASS = "USER_PASS";
     public static String  accountName = null;
+    private static Context context;
     private final int REQ_SIGNUP = 1;
 
     private final String TAG = this.getClass().getSimpleName();
 
     public static AccountManager mAccountManager;
+    public static String userName;
     private String mAuthTokenType;
 
     /**
@@ -86,10 +89,10 @@ public class Login extends AccountAuthenticatorActivity {
 
     public void submit() {
 
-        final String userName = ((EditText) findViewById(R.id.accountName)).getText().toString();
+        userName = ((EditText) findViewById(R.id.accountName)).getText().toString();
         final String userPass = ((EditText) findViewById(R.id.accountPassword)).getText().toString();
 
-        final String accountType = "com.example.ramy.myapplication";//getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+        final String accountType = "com.example.ramy.wayfare";//getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
         Log.d("udinic", TAG + accountType);
 
         new AsyncTask<String, Void, Intent>() {
@@ -103,19 +106,11 @@ public class Login extends AccountAuthenticatorActivity {
                 Bundle data = new Bundle();
                 try {
                     authtoken = serverTask.UserSignIn(userName, userPass);
-
+                    Log.d("SALEM", TAG + authtoken);
                     data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
                     data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
                     data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
                     data.putString(PARAM_USER_PASS, userPass);
-
-                    String y = ServerTask.getAuthToken(mAccountManager, userName);
-                    Log.w("TOKEN", y);//
-
-
-
-
-
                 } catch (Exception e) {
                     data.putString(KEY_ERROR_MESSAGE, e.getMessage());
                 }
@@ -137,6 +132,31 @@ public class Login extends AccountAuthenticatorActivity {
         }.execute();
     }
 
+    public void getToken()
+    {
+        new AsyncTask<String, Void, Intent>() {
+                    @Override
+                    protected Intent doInBackground(String... params) {
+                        Log.w("TOKEN", "yahia1245");
+                        try {
+                            Log.w("TOKEN", "yahia1234");
+                            Log.w("TOKEN12","sioufy");
+                            String y = ServerTask.getAuthToken(mAccountManager, accountName);
+                            Log.w("TOKEN", y);//
+                            return null;
+                        } catch (Exception e) {
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Intent intent) {
+                        Log.w("TOKEN", "yahia124");
+                        }
+                }.execute();
+    }
+
+
     private void finishLogin(Intent intent) {
         Log.d("udinic", TAG + "> finishLogin");
 
@@ -146,8 +166,9 @@ public class Login extends AccountAuthenticatorActivity {
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
         Log.d("udinic", TAG + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
-
-        if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
+        boolean available = checkAccount();
+        Log.e("Check Account", available+"");
+        if (!available) {
             Log.d("udinic", TAG + "> finishLogin > addAccountExplicitly");
             String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             String authtokenType = mAuthTokenType;
@@ -159,12 +180,42 @@ public class Login extends AccountAuthenticatorActivity {
             mAccountManager.setAuthToken(account, authtokenType, authtoken);
         } else {
             Log.d("udinic", TAG + "> finishLogin > setPassword");
+            String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
+            String authtokenType = mAuthTokenType;
             mAccountManager.setPassword(account, accountPassword);
+            mAccountManager.setAuthToken(account, authtokenType, authtoken);
         }
 
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
-        finish();
-    }
 
+        Intent i = new Intent(this, MainActivity1.class);
+        startActivity(i);
+//        finish();
+    }
+    public static boolean checkAccount() { //send ApplicationContext as a parameter
+        Account[] accounts = null;
+        boolean isPresent = false;
+        String accountname = accountName;
+//        AccountManager accountManager = AccountManager.get(context);
+        Account account = null;
+        if(accountname != null) {
+            try {
+                Log.e("name", accountname);
+                accounts = mAccountManager.getAccountsByType("com.example.ramy.wayfare");
+            } catch (SecurityException e) {
+                Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
+                toast.show();
+            }
+            for(Account a : accounts) {
+                Log.e("yahia",a.name.toString());
+
+                if(a.name.toString().equalsIgnoreCase(accountname)) {
+                    Log.e("yahia","yahia123");
+                    isPresent = true;
+                }
+            }
+        }
+        return isPresent;
+    }
 }

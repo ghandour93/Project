@@ -352,7 +352,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         if(accountname != null) {
             Log.e("yahia","yahia");
             try {
-            accounts = accountManager.getAccountsByType("com.example.ramy.myapplication");
+            accounts = accountManager.getAccountsByType("com.example.ramy.wayfare");
             } catch (SecurityException e) {
                 Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
             }

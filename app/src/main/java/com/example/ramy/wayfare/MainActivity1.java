@@ -1,20 +1,16 @@
 package com.example.ramy.wayfare;
 
-import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
@@ -62,6 +58,28 @@ public class MainActivity1 extends AppCompatActivity {
                 fragmentClass = fragmentOne.class;
                 break;
             case R.id.action_schedules:
+
+                Log.w("TOKEN", "yahia");
+                new AsyncTask<String, Void, Intent>() {
+                    @Override
+                    protected Intent doInBackground(String... params) {
+                        Log.w("TOKEN", "yahia1245");
+                        try {
+                            Log.w("TOKEN", "yahia1234");
+                            Log.w("TOKEN12","sioufy");
+                            String y = ServerTask.getAuthToken(Login.mAccountManager, Login.accountName);
+                            Log.w("TOKEN", y);//
+                            return null;
+                        } catch (Exception e) {
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Intent intent) {
+                        Log.w("TOKEN", "yahia124");
+                        }
+                }.execute();
                 fragmentClass = Profile1.class;
                 break;
             case R.id.action_music:
