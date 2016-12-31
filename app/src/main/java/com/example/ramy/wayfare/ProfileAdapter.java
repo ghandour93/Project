@@ -23,11 +23,11 @@ public class ProfileAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new Feed_Fragment();
+                    return new FeedFragment();
                 case 1:
-                    return new Feed_Fragment();
+                    return new FeedFragment();
                 case 2:
-                    return new Feed_Fragment();
+                    return new FeedFragment();
                 default:
                     return new ProfileFragment();
             }

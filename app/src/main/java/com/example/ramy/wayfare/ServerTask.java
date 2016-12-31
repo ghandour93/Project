@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class ServerTask extends AsyncTask<String,Void,String> {
@@ -41,6 +42,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     private String imageup_url = "http://10.0.2.2:8000/final/uploadImage/";
     private String feed_url="http://10.0.2.2:8000/final/Feed/";
     private String addRegId_url = "http://10.0.2.2:8000/final/addRegId/";
+    private String notifications_url = "http://10.0.2.2:8000/final/Notifications/";
     String result="";
     public String auth_token="";
     String token;
@@ -230,6 +232,26 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     }
     return null;
 	}
+
+    public JSONArray getNotifications(String username, String method){
+        try{
+            URL url = new URL(notifications_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, method, true);
+
+            result = getResult(httpURLConnection);
+
+            httpURLConnection.disconnect();
+
+            return new JSONArray(result);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public JSONObject getProfile(String username, String method)
     {

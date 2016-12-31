@@ -33,7 +33,7 @@ public class HomeActivity extends AppCompatActivity {
                 try {
                     auth_token = ServerTask.getAuthToken(Login.mAccountManager, Login.accountName);
                     Fragment fragment = null;
-                    Class fragmentClass = Feed_Fragment.class;
+                    Class fragmentClass = FeedFragment.class;
                     try {
                         fragment = (Fragment) fragmentClass.newInstance();
                     } catch (Exception e) {
@@ -74,16 +74,16 @@ public class HomeActivity extends AppCompatActivity {
         switch (menuItem.getItemId()) {
             case R.id.action_favorites:
 
-                fragmentClass = Feed_Fragment.class;
+                fragmentClass = FeedFragment.class;
                 break;
             case R.id.action_schedules:
                 fragmentClass = ProfileFragment.class;
                 break;
             case R.id.action_music:
-                fragmentClass = Feed_Fragment.class;
+                fragmentClass = NotificationsFragment.class;
                 break;
             default:
-                fragmentClass = Feed_Fragment.class;
+                fragmentClass = FeedFragment.class;
         }
 
         try {

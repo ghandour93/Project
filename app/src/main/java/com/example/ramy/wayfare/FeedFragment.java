@@ -16,13 +16,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class Feed_Fragment extends Fragment {
+public class FeedFragment extends Fragment {
     JSONArray obj = new JSONArray();
     SwipeRefreshLayout swipeRefreshLayout;
     RecyclerView rv;
     ArrayList<JSONObject> arraylist;
 
-    public Feed_Fragment() {
+    public FeedFragment() {
         // Required empty public constructor
     }
 
