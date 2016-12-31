@@ -23,12 +23,12 @@ import static com.example.ramy.wayfare.AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY_L
  * Date: 19/03/13
  * Time: 18:58
  */
-public class UdinicAuthenticator extends AbstractAccountAuthenticator {
+public class Authenticator extends AbstractAccountAuthenticator {
 
-    private String TAG = "UdinicAuthenticator";
+    private String TAG = "Authenticator";
     private final Context mContext;
 
-    public UdinicAuthenticator(Context context) {
+    public Authenticator(Context context) {
         super(context);
 
         // I hate you! Google - set mContext as protected!

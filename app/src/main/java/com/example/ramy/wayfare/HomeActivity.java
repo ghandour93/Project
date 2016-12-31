@@ -9,34 +9,54 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
-public class MainActivity1 extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
+
+    String auth_token;
+    Bundle b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main1);
+        setContentView(R.layout.activity_home);
         Fresco.initialize(this);
-
-        Fragment fragment1 = null;
-        Class fragmentClass = fragmentOne.class;
-        try {
-             fragment1 = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame, fragment1).addToBackStack(null);
-        fragmentTransaction.commit();
-        fragmentTransaction.addToBackStack(null);
-
+        b=new Bundle();
         BottomNavigationView bottomNavigationView = (BottomNavigationView)
                 findViewById(R.id.bottom_navigation);
+
+        new AsyncTask<String, Void, Intent>() {
+            @Override
+            protected Intent doInBackground(String... params) {
+                try {
+                    auth_token = ServerTask.getAuthToken(Login.mAccountManager, Login.accountName);
+                    Fragment fragment = null;
+                    Class fragmentClass = Feed_Fragment.class;
+                    try {
+                        fragment = (Fragment) fragmentClass.newInstance();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.frame, fragment).addToBackStack(null);
+                    fragmentTransaction.commit();
+                    fragmentTransaction.addToBackStack(null);
+                } catch (Exception e) {
+                }
+                return null;
+            }
+        }.execute();
+        while(true){
+            if (auth_token != null){
+                Intent i = new Intent(this, RegistrationService.class);
+                i.putExtra("auth_token", auth_token);
+                startService(i);
+                break;
+            }
+        }
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -49,60 +69,34 @@ public class MainActivity1 extends AppCompatActivity {
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
         switch (menuItem.getItemId()) {
             case R.id.action_favorites:
 
-                fragmentClass = fragmentOne.class;
+                fragmentClass = Feed_Fragment.class;
                 break;
             case R.id.action_schedules:
-
-                Log.w("TOKEN", "yahia");
-                new AsyncTask<String, Void, Intent>() {
-                    @Override
-                    protected Intent doInBackground(String... params) {
-                        Log.w("TOKEN", "yahia1245");
-                        try {
-                            Log.w("TOKEN", "yahia1234");
-                            Log.w("TOKEN12","sioufy");
-                            String y = ServerTask.getAuthToken(Login.mAccountManager, Login.accountName);
-                            Log.w("TOKEN", y);//
-                            return null;
-                        } catch (Exception e) {
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Intent intent) {
-                        Log.w("TOKEN", "yahia124");
-                        }
-                }.execute();
-                fragmentClass = Profile1.class;
+                fragmentClass = ProfileFragment.class;
                 break;
             case R.id.action_music:
-                fragmentClass = fragmentOne.class;
+                fragmentClass = Feed_Fragment.class;
                 break;
             default:
-                fragmentClass = fragmentOne.class;
+                fragmentClass = Feed_Fragment.class;
         }
 
         try {
             fragment = (Fragment) fragmentClass.newInstance();
+            fragment.setArguments(b);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment).addToBackStack(null);
         fragmentTransaction.commit();
         fragmentTransaction.addToBackStack(null);
-
-        // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);
     }
 
@@ -114,6 +108,10 @@ public class MainActivity1 extends AppCompatActivity {
         else {
             super.onBackPressed();
         }
+    }
+
+    public String getToken(){
+        return auth_token;
     }
 
 }

@@ -4,20 +4,14 @@ package com.example.ramy.wayfare;
  * Created by ysalem1 on 12/8/2016.
  */
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,14 +20,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.MyViewHolder> {
     private ArrayList<JSONObject> mDataset;
-    private Context context;
-    private int lastPosition;
-    private View view;
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
+
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public CardView mCardView;
         public TextView mTextView, username, location;
@@ -48,37 +37,27 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             location = (TextView)v.findViewById(R.id.tv_location);
             mTextView.setVisibility(View.GONE);
             iv.setVisibility(View.GONE);
-//            v.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    view.getContext().startActivity(new Intent(view.getContext(),TripInfo.class));
-//                }
-//            });
+            iv.setVisibility(View.GONE);
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(ArrayList<JSONObject> myDataset) {
+    public FeedAdapter(ArrayList<JSONObject> myDataset) {
         mDataset = myDataset;
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
-    public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
-                                                     int viewType) {
-        // create a new view
+    public FeedAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
+                                                       int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card_item, parent, false);
-        // set the view's size, margins, paddings and layout parameters
+                .inflate(R.layout.feed_item, parent, false);
         MyViewHolder vh = new MyViewHolder(v);
-        view = v;
         return vh;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-            JSONObject obj = new JSONObject();
+            JSONObject obj;
         obj=mDataset.get(position);
         try {
 
@@ -86,7 +65,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 holder.mTextView.setVisibility(View.VISIBLE);
             }
             else if (obj.getString("type").equals("image")) {
-                Log.i("feed","image");
                 holder.iv.setVisibility(View.VISIBLE);
                 String image = obj.getString("encoded_file");
                 byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
@@ -99,8 +77,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             e.printStackTrace();
         }
     }
-
-//        holder.iv.setBackgroundResource(R.mipmap.ic_launcher);
 
     @Override
     public int getItemCount() {

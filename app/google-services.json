@@ -1,0 +1,61 @@
+{
+  "project_info": {
+    "project_number": "25322891031",
+    "project_id": "firebase-wayfare"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:25322891031:android:634de958a287a828",
+        "android_client_info": {
+          "package_name": "com.wayfare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN0D_x_-fM8P59cT5v8IJMfaDwpgSsO48"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:25322891031:android:c744f7652cee7e06",
+        "android_client_info": {
+          "package_name": "com.example.ramy.wayfare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN0D_x_-fM8P59cT5v8IJMfaDwpgSsO48"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

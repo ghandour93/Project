@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.ramy.wayfare", appContext.getPackageName());
+        assertEquals("com.example.ramy.com.wayfare", appContext.getPackageName());
     }
 }

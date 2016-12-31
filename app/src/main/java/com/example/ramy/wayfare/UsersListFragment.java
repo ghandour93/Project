@@ -1,8 +1,5 @@
 package com.example.ramy.wayfare;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,11 +14,11 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 
-public class List1 extends Fragment {
+public class UsersListFragment extends Fragment {
     String item;
     Bundle b;
 
-    public List1() {
+    public UsersListFragment() {
         // Required empty public constructor
     }
 
@@ -35,7 +32,7 @@ public class List1 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_list1, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_userslist, container, false);
         final ListView listView = (ListView) rootView.findViewById(R.id.listview);
         ArrayList<String> following = getArguments().getStringArrayList("following");
         ArrayList<String> followers = getArguments().getStringArrayList("followers");
@@ -54,7 +51,7 @@ public class List1 extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Fragment fragment1 = null;
-                Class fragmentClass = Profile1.class;
+                Class fragmentClass = ProfileFragment.class;
                 try {
                     fragment1 = (Fragment) fragmentClass.newInstance();
                     item=(String) listView.getItemAtPosition(position);

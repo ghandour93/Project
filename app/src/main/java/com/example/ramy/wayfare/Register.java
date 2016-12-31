@@ -11,7 +11,7 @@ package com.example.ramy.wayfare;
 //import android.widget.Toast;
 //
 //import static android.accounts.AccountManager.KEY_ERROR_MESSAGE;
-//import static com.example.ramy.wayfare.MainActivity.PARAM_USER_PASS;
+//import static com.example.ramy.com.wayfare.MainActivity.PARAM_USER_PASS;
 //
 //public class Register extends AppCompatActivity {
 //
@@ -20,7 +20,7 @@ package com.example.ramy.wayfare;
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
-//		mAccountType = "com.example.ramy.wayfare";//getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+//		mAccountType = "com.example.ramy.com.wayfare";//getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 //        setContentView(R.layout.activity_register);
 //        editText= (EditText) findViewById(R.id.editText);
 //        editText3= (EditText) findViewById(R.id.editText3);
@@ -96,7 +96,7 @@ public class Register extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAccountType = "com.example.ramy.wayfare";
+        mAccountType = "com.example.ramy.com.wayfare";
         setContentView(R.layout.activity_register);
 //        this.getSupportActionBar().hide();
         viewPager = (DynamicViewPager) findViewById(R.id.pager);

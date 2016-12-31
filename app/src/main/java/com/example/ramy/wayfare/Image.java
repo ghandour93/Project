@@ -5,24 +5,19 @@ import android.content.CursorLoader;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class Image extends AppCompatActivity {
@@ -129,9 +124,6 @@ public class Image extends AppCompatActivity {
 
     public void ImgUp(View view){
         String type = "imageup";
-        //BackgroundWorker backgroundWorker = new BackgroundWorker(this);
-        // backgroundWorker.execute(type, username, password, displayname);
-//        HttpAsyncTask backgroundWorker = new HttpAsyncTask(this);
         String[]  data = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(this, imageUri, data, null, null, null);
         Cursor cursor = loader.loadInBackground();
@@ -139,12 +131,8 @@ public class Image extends AppCompatActivity {
         cursor.moveToFirst();
         String path = cursor.getString(column_index);
         cursor.close();
-        ServerTask backgroundWorker = new ServerTask(this);
+        ServerTask backgroundWorker = new ServerTask(this,"");
         backgroundWorker.execute(type,path);
     }
 
-    public void ImgDown(View view){
-        ImageDownload backgroundWorker = new ImageDownload(this,imgView);
-        backgroundWorker.execute("ramy","ramy");
-    }
 }

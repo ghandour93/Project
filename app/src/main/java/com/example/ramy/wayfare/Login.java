@@ -101,7 +101,7 @@ public class Login extends AccountAuthenticatorActivity {
             protected Intent doInBackground(String... params) {
 
                 Log.d("udinic", TAG + "> Started authenticating");
-                ServerTask serverTask = new ServerTask(Login.this);
+                ServerTask serverTask = new ServerTask(Login.this,"");
                 String authtoken = null;
                 Bundle data = new Bundle();
                 try {
@@ -189,7 +189,7 @@ public class Login extends AccountAuthenticatorActivity {
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
 
-        Intent i = new Intent(this, MainActivity1.class);
+        Intent i = new Intent(this, HomeActivity.class);
         startActivity(i);
 //        finish();
     }
@@ -202,7 +202,7 @@ public class Login extends AccountAuthenticatorActivity {
         if(accountname != null) {
             try {
                 Log.e("name", accountname);
-                accounts = mAccountManager.getAccountsByType("com.example.ramy.wayfare");
+                accounts = mAccountManager.getAccountsByType("com.example.ramy.com.wayfare");
             } catch (SecurityException e) {
                 Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
                 toast.show();
