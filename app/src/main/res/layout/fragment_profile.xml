@@ -58,7 +58,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:gravity="top"
-                        android:text="Ramy El Ghandour"
                         android:textColor="@android:color/white"
                         android:textSize="30sp" />
 
@@ -68,7 +67,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:textSize="20sp"
-                        android:text="Cairo, Egypt"
                         android:textColor="@android:color/white" />
 
                 </LinearLayout>
@@ -98,7 +96,7 @@
                             android:id="@+id/following"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="250"
+                            android:text="---"
                             android:textColor="@android:color/white"
                             android:textSize="22sp"
                             android:layout_marginLeft="27dp"
@@ -167,7 +165,7 @@
                             android:id="@+id/followers"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="250"
+                            android:text="---"
                             android:textColor="@android:color/white"
                             android:textSize="22sp"
                             android:textStyle="normal|italic"
@@ -181,7 +179,7 @@
                             android:id="@+id/countries"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="250"
+                            android:text="---"
                             android:textColor="@android:color/white"
                             android:textSize="22sp"
                             android:layout_marginLeft="27dp"

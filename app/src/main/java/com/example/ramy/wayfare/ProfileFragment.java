@@ -1,6 +1,7 @@
 package com.example.ramy.wayfare;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +59,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private LinearLayout linearlayoutTitle;
     private LinearLayout lineartoolbar;
     private static Toolbar toolbar;
+    private AppBarLayout abLayout;
+    private int offst;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
     private TextView name;
     private TextView location;
     private SimpleDraweeView avatar;
@@ -119,16 +125,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
         findViews(rootView);
-        TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
+        tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Tab 1"));
         tabLayout.addTab(tabLayout.newTab().setText("Tab 2"));
         tabLayout.addTab(tabLayout.newTab().setText("Tab 3"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
-        viewPager.setAdapter(new ProfileAdapter(getChildFragmentManager()));
-        viewPager.setCurrentItem(0);
-        tabLayout.setupWithViewPager(viewPager);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         context = getActivity();
         toolbar.setTitle("");
         appbar.addOnOffsetChangedListener(this);
@@ -141,23 +143,32 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         c = getArguments();
         if (c != null)
             bool = c.containsKey("notmine");
-        new AsyncTask<String, Void, Intent>() {
-            ServerTask s = new ServerTask(getActivity(), ((HomeActivity)getActivity()).getToken());
+        new ServerTask(getActivity(),((HomeActivity)getActivity()).getToken()){
 
             @Override
-            protected Intent doInBackground(String... params) {
+            protected String doInBackground(String... params) {
                 try {
                     if (bool) {
-                        profile = s.getProfile(c.getString("userprofile"), "POST");
+                        profile = getProfile(c.getString("userprofile"), "POST");
                     } else {
-                        profile = s.getProfile("", "GET");
+                        profile = getProfile("", "GET");
                     }
+                    publishProgress();
 
                 } catch (Exception e) {
 
                 }
-                loadProfileData(profile);
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Void... values) {
+                loadProfileData(profile);
+                viewPager.setAdapter(new ProfileAdapter(getChildFragmentManager()));
+                viewPager.setCurrentItem(0);
+                tabLayout.setupWithViewPager(viewPager);
+                viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+                super.onProgressUpdate(values);
             }
         }.execute();
 
@@ -169,13 +180,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 try {
                     fragment1 = (Fragment) fragmentClass.newInstance();
                     b.putInt("id", 1);
+                    b.putString("username", profile.getString("user"));
                     fragment1.setArguments(b);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment1).addToBackStack(null);
+                fragmentTransaction.replace(R.id.relative_lay, fragment1).addToBackStack(null);
                 fragmentTransaction.commit();
                 fragmentTransaction.addToBackStack(null);
             }
@@ -188,13 +200,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 try {
                     fragment1 = (Fragment) fragmentClass.newInstance();
                     b.putInt("id", 2);
+                    b.putString("username", profile.getString("user"));
                     fragment1.setArguments(b);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment1).addToBackStack(null);
+                fragmentTransaction.replace(R.id.relative_lay, fragment1).addToBackStack(null);
                 fragmentTransaction.commit();
                 fragmentTransaction.addToBackStack(null);
             }
@@ -205,12 +218,19 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-        float maxScroll = appBarLayout.getTotalScrollRange();
-        float percentage = (float) Math.abs(offset) / maxScroll;
-        ScaleText(name, location, percentage);
-        ImageAnimation(avatar,1f - percentage, Math.abs(offset));
-        TextAnimation1(name, 1f - percentage, Math.abs(offset));
-        TextAnimation2(location, 1f - percentage, Math.abs(offset));
+        abLayout = appBarLayout;
+        offst = offset;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                float maxScroll = abLayout.getTotalScrollRange();
+                float percentage = (float) Math.abs(offst) / maxScroll;
+                ScaleText(name, location, percentage);
+                ImageAnimation(avatar, 1f - percentage, Math.abs(offst));
+                TextAnimation1(name, 1f - percentage, Math.abs(offst));
+                TextAnimation2(location, 1f - percentage, Math.abs(offst));
+            }
+        });
     }
 
 
@@ -275,7 +295,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     public void ImageAnimation(SimpleDraweeView avatar, float expandedPercentageFactor, float dist) {
         InitPropertiesImage(avatar, dist);
         if (expandedPercentageFactor <= 1 && expandedPercentageFactor != z) {
-
             float distanceXToSubtract = ((mStartXPosition - mFinalXPosition)
                     * (1f - expandedPercentageFactor)) + (avatar.getWidth() / 2);
 
@@ -290,7 +309,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             lp.height = (int) (mStartHeight - heightToSubtract);
             avatar.setLayoutParams(lp);
             z = expandedPercentageFactor;
-
         }
     }
 
@@ -337,26 +355,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     public void loadProfileData(JSONObject obj) {
         try {
-            String username = obj.getString("user");
-            String location1 = obj.getString("location");
-            name.setText(username);
-            location.setText(location1);
+            name.setText(obj.getString("user"));
+            location.setText(obj.getString("location"));
             following.setText(obj.getString("following_count"));
             followers.setText(obj.getString("followers_count"));
-            JSONArray x = obj.getJSONArray("following");
-            JSONArray y = obj.getJSONArray("followers");
-            int length = x.length();
-            ArrayList<String> followinglist = new ArrayList<>(length);
-            for (int i = 0; i < length; i++) {
-                followinglist.add(x.getString(i));
-            }
-            length = y.length();
-            ArrayList<String> followerslist = new ArrayList<>(length);
-            for (int i = 0; i < length; i++) {
-                followerslist.add(y.getString(i));
-            }
-            b.putStringArrayList("following", followinglist);
-            b.putStringArrayList("followers", followerslist);
         } catch (JSONException e) {
             e.printStackTrace();
         }

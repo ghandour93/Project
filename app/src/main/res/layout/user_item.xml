@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:fresco="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:focusable="false"
+    android:id="@+id/relative_lay">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/avatar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        fresco:roundAsCircle="true"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="25dp"
+        android:focusable="false"/>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_username"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/avatar"
+        android:layout_marginStart="17dp"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="18sp"
+        android:textAlignment="viewStart"
+        android:focusable="false"/>
+
+    <Button
+        android:text="Follow"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="25dp"
+        android:focusable="false"
+        android:id="@+id/btn_follow"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:background="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
+        android:layout_width="120dp"
+        android:textAlignment="center" />
+</RelativeLayout>

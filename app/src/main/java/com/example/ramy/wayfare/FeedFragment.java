@@ -11,7 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;;import org.json.JSONArray;
-import org.json.JSONException;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ public class FeedFragment extends Fragment {
     JSONArray obj = new JSONArray();
     SwipeRefreshLayout swipeRefreshLayout;
     RecyclerView rv;
+    View rootView;
     ArrayList<JSONObject> arraylist;
 
     public FeedFragment() {
@@ -35,61 +36,69 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
-        rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
-        rv.setHasFixedSize(true);
-        arraylist= refresh();
-        FeedAdapter adapter = new FeedAdapter(arraylist);
-
-
-        rv.setAdapter(adapter);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        rv.setLayoutManager(llm);
-
+        rootView = inflater.inflate(R.layout.fragment_feed, container, false);
+        refresh();
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh() {
-                arraylist= refresh();
-                FeedAdapter adapter = new FeedAdapter(arraylist);
-
+                refresh();
                 swipeRefreshLayout.setRefreshing(false);
-                rv.setAdapter(adapter);
             }
         });
-
         return rootView;
     }
 
-    public ArrayList<JSONObject> refresh(){
-        ArrayList<JSONObject> arraylist = new ArrayList<>();
-        new AsyncTask<String, Void, Intent>() {
+    public void showLoading(){
+        rootView.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.relative_lay).setVisibility(View.GONE);
+    }
 
-            ServerTask s = new ServerTask(getActivity(),((HomeActivity)getActivity()).getToken());
+    public void hideLoading(){
+        rootView.findViewById(R.id.progressBar).setVisibility(View.GONE);
+        rootView.findViewById(R.id.relative_lay).setVisibility(View.VISIBLE);
+    }
+
+    public void refresh(){
+        arraylist = new ArrayList<>();
+        new ServerTask(getActivity(),((HomeActivity)getActivity()).getToken()){
+
             @Override
-            protected Intent doInBackground(String... params) {
+            protected void onPreExecute() {
+                showLoading();
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                hideLoading();
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
                 try {
-                    obj=s.getFeed("", "GET", true);
+                    obj=getFeed("", "GET", true);
+                        for (int i = 0; i < obj.length(); i++) {
+                            arraylist.add(obj.getJSONObject(i));
+                        }
+                    publishProgress();
+
                 } catch (Exception e) {
 
                 }
                 return null;
             }
-        }.execute();
-        while(true) {
-            if (obj.length()!=0) {
-                for (int i = 0; i < obj.length(); i++) {
-                    try {
-                        arraylist.add(obj.getJSONObject(i));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
+
+            @Override
+            protected void onProgressUpdate(Void... values) {
+                rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
+                rv.setHasFixedSize(true);
+                LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+                rv.setLayoutManager(llm);
+                FeedAdapter adapter = new FeedAdapter(arraylist);
+                rv.setAdapter(adapter);
+                super.onProgressUpdate(values);
             }
-        }
-        return arraylist;
+        }.execute();
     }
 
 }

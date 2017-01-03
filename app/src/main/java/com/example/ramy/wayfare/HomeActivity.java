@@ -41,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.frame, fragment).addToBackStack(null);
+                    fragmentTransaction.replace(R.id.relative_lay, fragment).addToBackStack(null);
                     fragmentTransaction.commit();
                     fragmentTransaction.addToBackStack(null);
                 } catch (Exception e) {
@@ -94,7 +94,7 @@ public class HomeActivity extends AppCompatActivity {
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame, fragment).addToBackStack(null);
+        fragmentTransaction.replace(R.id.relative_lay, fragment).addToBackStack(null);
         fragmentTransaction.commit();
         fragmentTransaction.addToBackStack(null);
         menuItem.setChecked(true);

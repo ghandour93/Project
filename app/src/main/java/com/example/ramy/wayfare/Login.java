@@ -32,6 +32,7 @@ public class Login extends AccountAuthenticatorActivity {
     public static String  accountName = null;
     private static Context context;
     private final int REQ_SIGNUP = 1;
+    final Intent res = new Intent();
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -95,17 +96,19 @@ public class Login extends AccountAuthenticatorActivity {
         final String accountType = "com.example.ramy.wayfare";//getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
         Log.d("udinic", TAG + accountType);
 
-        new AsyncTask<String, Void, Intent>() {
+        new ServerTask(Login.this,""){
 
             @Override
-            protected Intent doInBackground(String... params) {
+            protected void onPreExecute() {
+                setContentView(R.layout.progressbar_large);
+            }
 
-                Log.d("udinic", TAG + "> Started authenticating");
-                ServerTask serverTask = new ServerTask(Login.this,"");
+            @Override
+            protected String doInBackground(String... params) {
                 String authtoken = null;
                 Bundle data = new Bundle();
                 try {
-                    authtoken = serverTask.UserSignIn(userName, userPass);
+                    authtoken = UserSignIn(userName, userPass);
                     Log.d("SALEM", TAG + authtoken);
                     data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
                     data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
@@ -114,20 +117,15 @@ public class Login extends AccountAuthenticatorActivity {
                 } catch (Exception e) {
                     data.putString(KEY_ERROR_MESSAGE, e.getMessage());
                 }
-
-                final Intent res = new Intent();
                 res.putExtras(data);
-                return res;
+                publishProgress();
+                return null;
             }
 
             @Override
-            protected void onPostExecute(Intent intent) {
-                if (intent.hasExtra(KEY_ERROR_MESSAGE)) {
-                    Toast.makeText(getBaseContext(), intent.getStringExtra(KEY_ERROR_MESSAGE), Toast.LENGTH_SHORT).show();
-                } else {
-
-                    finishLogin(intent);
-                }
+            protected void onProgressUpdate(Void... values) {
+                finishLogin(res);
+                super.onProgressUpdate(values);
             }
         }.execute();
     }

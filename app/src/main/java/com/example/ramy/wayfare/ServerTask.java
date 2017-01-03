@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -39,13 +40,16 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     private String user_url = "http://10.0.2.2:8000/auth/register/";
     private String login_url = "http://10.0.2.2:8000/auth/login/";
     private String profile_url = "http://10.0.2.2:8000/final/Profile/";
+    private String profiles_url = "http://10.0.2.2:8000/final/Profiles/";
     private String imageup_url = "http://10.0.2.2:8000/final/uploadImage/";
     private String feed_url="http://10.0.2.2:8000/final/Feed/";
     private String addRegId_url = "http://10.0.2.2:8000/final/addRegId/";
+    private String editFollow_url = "http://10.0.2.2:8000/final/editFollow/";
     private String notifications_url = "http://10.0.2.2:8000/final/Notifications/";
     String result="";
     public String auth_token="";
     String token;
+    ProgressDialog dialog;
     private Account[] mAccount;
 
     ServerTask(Context ctx, String tkn) {
@@ -117,19 +121,6 @@ public class ServerTask extends AsyncTask<String,Void,String> {
 
         }
         return null;
-    }
-
-
-    @Override
-    protected void onPreExecute() {
-        alertDialog = new AlertDialog.Builder(context).create();
-        alertDialog.setTitle("Login Status");
-    }
-
-    @Override
-    protected void onPostExecute(String result) {
-        alertDialog.setMessage(result);
-        alertDialog.show();
     }
 
     @Override
@@ -233,6 +224,35 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     return null;
 	}
 
+    public boolean editFollow(String username)
+    {
+        try{
+            URL url = new URL(editFollow_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
+                JSONObject user = new JSONObject();
+                user.put("username", username);
+
+                OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+                wr.write(user.toString());
+                wr.flush();
+
+            result = getResult(httpURLConnection);
+
+            httpURLConnection.disconnect();
+
+            if (result.equals("success"))
+                return true;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public JSONArray getNotifications(String username, String method){
         try{
             URL url = new URL(notifications_url);
@@ -272,6 +292,37 @@ public class ServerTask extends AsyncTask<String,Void,String> {
             httpURLConnection.disconnect();
 
             return new JSONObject(result);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public JSONArray getProfiles(int id, String username, String method){
+        try {
+            URL url = new URL(profiles_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, method, true);
+            if (method.equals("POST")) {
+                JSONObject user = new JSONObject();
+                user.put("id", id);
+                user.put("username", username);
+
+                OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+                wr.write(user.toString());
+                wr.flush();
+            }
+
+            String result = getResult(httpURLConnection);
+
+
+            JSONArray obj = new JSONArray(result);
+
+            httpURLConnection.disconnect();
+            return obj;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
