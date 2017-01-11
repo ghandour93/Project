@@ -9,6 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
@@ -31,6 +34,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 
 public class ServerTask extends AsyncTask<String,Void,String> {
@@ -44,6 +49,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     private String imageup_url = "http://10.0.2.2:8000/final/uploadImage/";
     private String feed_url="http://10.0.2.2:8000/final/Feed/";
     private String addRegId_url = "http://10.0.2.2:8000/final/addRegId/";
+    private String postText_url = "http://10.0.2.2:8000/final/postText/";
     private String editFollow_url = "http://10.0.2.2:8000/final/editFollow/";
     private String notifications_url = "http://10.0.2.2:8000/final/Notifications/";
     String result="";
@@ -224,8 +230,52 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     return null;
 	}
 
-    public boolean editFollow(String username)
+    public boolean postText(String text, Location location)
     {
+        try{
+            Log.d("ramy","task");
+            JSONObject user = new JSONObject();
+            if (location!=null) {
+                Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+//                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+//                String cityName = addresses.get(0).getAddressLine(0);
+//                String countryName = addresses.get(0).getAddressLine(1);
+                Log.d("ramy","task");
+                Log.d("ramy",String.valueOf(location.getLongitude()));
+                Log.d("ramy",String.valueOf(location.getLongitude()));
+
+//                Log.d("city", cityName);
+//                Log.d("country", countryName);
+                user.put("long", location.getLongitude());
+                user.put("lat", location.getLatitude());
+//                user.put("location", cityName + ", " + countryName);
+            }
+            URL url = new URL(postText_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
+            user.put("text", text);
+
+            OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+            wr.write(user.toString());
+            wr.flush();
+
+            result = getResult(httpURLConnection);
+
+            httpURLConnection.disconnect();
+
+            if (result.equals("success"))
+                return true;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean editFollow(String username) {
         try{
             URL url = new URL(editFollow_url);
             HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
@@ -333,19 +383,18 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return null;
     }
 
-    public JSONArray getFeed(String username, String method, boolean personal){
+    public JSONArray getFeed(String username, boolean myfeed, boolean personal, int itemNumber){
         try {
             URL url = new URL(feed_url);
-            HttpURLConnection httpURLConnection = setupConnection(url, method, true);
-            if (method.equals("POST")) {
+            HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
                 JSONObject user = new JSONObject();
                 user.put("username", username);
                 user.put("personal", personal);
-
+                user.put("items", itemNumber);
+                user.put("myfeed", myfeed);
                 OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
                 wr.write(user.toString());
                 wr.flush();
-            }
 
             String result = getResult(httpURLConnection);
 
@@ -365,13 +414,14 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     }
 
 
-    public void addRegId(String reg_id) {
+    public void addRegId(String reg_id_new, String reg_id_old) {
         try {
             URL url = new URL(addRegId_url);
             HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
                 JSONObject user = new JSONObject();
-                user.put("reg_id", reg_id);
-
+                user.put("reg_id_new", reg_id_new);
+                if (reg_id_old!=null)
+                    user.put("reg_id_old", reg_id_old);
                 OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
                 wr.write(user.toString());
                 wr.flush();

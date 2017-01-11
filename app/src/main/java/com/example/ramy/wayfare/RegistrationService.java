@@ -21,24 +21,22 @@ public class RegistrationService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         InstanceID myID = InstanceID.getInstance(this);
         try {
-            String registrationToken = myID.getToken(
+            String reg_id_new = myID.getToken(
                     getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE,
                     null
             );
             SharedPreferences prefs = getSharedPreferences("WayFare", MODE_PRIVATE);
-            String reg_id = prefs.getString("reg_id", null);
-            if((reg_id != null && !reg_id.equals(registrationToken)) || reg_id == null) {
+            String reg_id_old = prefs.getString("reg_id", null);
+            if((reg_id_old != null && !reg_id_old.equals(reg_id_new)) || reg_id_old == null) {
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("reg_id", registrationToken);
+                editor.putString("reg_id", reg_id_new);
                 editor.apply();
                 Log.d("Added to prefs", "YES");
-                editor.clear();
-                editor.apply();
                 ServerTask s = new ServerTask(this, intent.getStringExtra("auth_token"));
-                s.addRegId(registrationToken);
+                s.addRegId(reg_id_new, reg_id_old);
             }
-            Log.d("Registration Token", registrationToken);
+            Log.d("Registration Token", reg_id_new);
         } catch (IOException e) {
             e.printStackTrace();
         }

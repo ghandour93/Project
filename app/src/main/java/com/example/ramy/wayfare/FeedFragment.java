@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;;import org.json.JSONArray;
@@ -22,6 +23,12 @@ public class FeedFragment extends Fragment {
     RecyclerView rv;
     View rootView;
     ArrayList<JSONObject> arraylist;
+    Bundle b;
+    String username;
+    Boolean bool;
+    private EndlessRecyclerViewScrollListener scrollListener;
+    FeedAdapter adapter;
+    int items;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -30,19 +37,32 @@ public class FeedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_feed, container, false);
-        refresh();
+        arraylist = new ArrayList<>();
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
+        rv.setHasFixedSize(true);
+        rv.setLayoutManager(llm);
+        adapter = new FeedAdapter(arraylist);
+        rv.setAdapter(adapter);
+        scrollListener = new EndlessRecyclerViewScrollListener(llm) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                refresh(totalItemsCount);
+            }
+        };
+        refresh(0);
+        rv.addOnScrollListener(scrollListener);
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh() {
-                refresh();
+                refresh(0);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -59,44 +79,45 @@ public class FeedFragment extends Fragment {
         rootView.findViewById(R.id.relative_lay).setVisibility(View.VISIBLE);
     }
 
-    public void refresh(){
-        arraylist = new ArrayList<>();
+    public void refresh(int itemNumber){
+        items=itemNumber;
+
         new ServerTask(getActivity(),((HomeActivity)getActivity()).getToken()){
 
             @Override
             protected void onPreExecute() {
-                showLoading();
+                if (items == 0) {
+                    arraylist.clear();
+                    showLoading();
+                    scrollListener.resetState();
+                }
+
             }
 
             @Override
             protected void onPostExecute(String result) {
-                hideLoading();
+                if (items == 0)
+                    hideLoading();
+                adapter.notifyDataSetChanged();
+
             }
 
             @Override
             protected String doInBackground(String... params) {
                 try {
-                    obj=getFeed("", "GET", true);
+                    if(getArguments()!=null && getArguments().containsKey("username")){
+                        obj = getFeed(getArguments().getString("username"), false, false, items);
+                    }else {
+                        obj = getFeed("", true, false, items);
+                    }
                         for (int i = 0; i < obj.length(); i++) {
                             arraylist.add(obj.getJSONObject(i));
                         }
-                    publishProgress();
 
                 } catch (Exception e) {
 
                 }
                 return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(Void... values) {
-                rv = (RecyclerView) rootView.findViewById(R.id.rv_recycler_view);
-                rv.setHasFixedSize(true);
-                LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-                rv.setLayoutManager(llm);
-                FeedAdapter adapter = new FeedAdapter(arraylist);
-                rv.setAdapter(adapter);
-                super.onProgressUpdate(values);
             }
         }.execute();
     }

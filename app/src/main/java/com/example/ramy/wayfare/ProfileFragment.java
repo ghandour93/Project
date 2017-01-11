@@ -70,7 +70,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private TextView following;
     private TextView followers;
     private RelativeLayout relativeprof;
-    public JSONObject profile = null;
+    public JSONObject profile;
     private Fragment currentFrag;
     boolean bool;
 
@@ -136,6 +136,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         appbar.addOnOffsetChangedListener(this);
         b=new Bundle();
         bool = false;
+        profile=null;
 
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithResourceId(R.drawable.ic_launcher).build();
@@ -163,8 +164,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
             @Override
             protected void onProgressUpdate(Void... values) {
-                loadProfileData(profile);
-                viewPager.setAdapter(new ProfileAdapter(getChildFragmentManager()));
+                loadProfileData();
+                try {
+                    viewPager.setAdapter(new ProfileAdapter(getChildFragmentManager(), profile.getString("user")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 viewPager.setCurrentItem(0);
                 tabLayout.setupWithViewPager(viewPager);
                 viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -353,12 +358,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             mFinalXPosition2 = ((LinearLayout) child.getParent()).getWidth() - (context.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (child.getWidth() / 2));
     }
 
-    public void loadProfileData(JSONObject obj) {
+    public void loadProfileData() {
         try {
-            name.setText(obj.getString("user"));
-            location.setText(obj.getString("location"));
-            following.setText(obj.getString("following_count"));
-            followers.setText(obj.getString("followers_count"));
+            name.setText(profile.getString("user"));
+            location.setText(profile.getString("location"));
+            following.setText(profile.getString("following_count"));
+            followers.setText(profile.getString("followers_count"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

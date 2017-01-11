@@ -5,19 +5,25 @@
     <uses-sdk
         android:maxSdkVersion="23"
         android:minSdkVersion="17" />
+
     <permission
         android:name="com.example.ramy.wayfare.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission
-        android:name="com.example.ramy.wayfare.permission.C2D_MESSAGE" />
 
+    <uses-permission android:name="com.example.ramy.wayfare.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera2.full" />
+    <uses-feature android:name="android.hardware.location.gps" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,13 +31,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.example.ramy.wayfare.Register"
+            android:name=".Register"
             android:label="Register"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name="com.example.ramy.wayfare.Image" >
-        </activity>
+        <activity android:name=".Image" />
 
-        <service android:name="com.example.ramy.wayfare.AuthenticatorService">
+        <service android:name=".AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -40,18 +45,16 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-
-        <service android:name=".RegistrationService"
+        <service
+            android:name=".RegistrationService"
             android:exported="false" />
-
         <service
             android:name=".NotificationsListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".TokenRefreshListenerService"
             android:exported="false">
@@ -59,25 +62,29 @@
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
+        <service android:name=".GpsService" />
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.example.ramy.wayfare" />
             </intent-filter>
         </receiver>
 
-        <activity android:name="com.example.ramy.wayfare.Login">
+        <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-    </activity>
-        <activity android:name="com.example.ramy.wayfare.HomeActivity"/>
+        </activity>
+        <activity android:name=".HomeActivity" />
+        <activity android:name=".PostActivity"></activity>
+        <activity android:name=".PostImageActivity"></activity>
     </application>
-
 
 </manifest>
