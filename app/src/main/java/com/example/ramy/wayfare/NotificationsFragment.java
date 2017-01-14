@@ -72,6 +72,12 @@ public class NotificationsFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        ((OnNotificationsFragmentSelected)getActivity()).onNotificationsFragmentDisplayed();
+    }
+
     public void showLoading(){
         rootView.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
         rootView.findViewById(R.id.relative_lay).setVisibility(View.GONE);
@@ -80,5 +86,9 @@ public class NotificationsFragment extends Fragment {
     public void hideLoading(){
         rootView.findViewById(R.id.progressBar).setVisibility(View.GONE);
         rootView.findViewById(R.id.relative_lay).setVisibility(View.VISIBLE);
+    }
+
+    public interface OnNotificationsFragmentSelected{
+        void onNotificationsFragmentDisplayed();
     }
 }

@@ -8,6 +8,7 @@ package com.example.ramy.wayfare;
  */
 public class AccountGeneral {
 
+    public static final int NOTIFICATIONS_FRAGMENT = 4;
     /**
      * Account type id
      */

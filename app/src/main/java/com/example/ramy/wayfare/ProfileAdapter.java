@@ -19,6 +19,7 @@ public class ProfileAdapter extends FragmentPagerAdapter {
         username = user;
         b=new Bundle();
         b.putString("username", username);
+        b.putBoolean("profile", true);
     }
 
     @Override

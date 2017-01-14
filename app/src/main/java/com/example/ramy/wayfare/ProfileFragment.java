@@ -65,6 +65,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private TabLayout tabLayout;
     private TextView name;
     private TextView location;
+    private TextView bio;
     private SimpleDraweeView avatar;
     private RelativeLayout relativelay;
     private TextView following;
@@ -100,6 +101,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         collapsing = (CollapsingToolbarLayout) view.findViewById(R.id.collapsingToolbarLayout);
         name = (TextView) view.findViewById(R.id.name);
         location = (TextView) view.findViewById(R.id.location);
+        bio = (TextView) view.findViewById(R.id.textView5);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         avatar = (SimpleDraweeView) view.findViewById(R.id.avatar);
         relativelay = (RelativeLayout) view.findViewById(R.id.relativelay);
@@ -219,6 +221,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (bool)
+            ((OnProfileFragmentSelected)getActivity()).onProfileFragmentDisplayed(false);
+        else
+            ((OnProfileFragmentSelected)getActivity()).onProfileFragmentDisplayed(true);
     }
 
     @Override
@@ -362,10 +373,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         try {
             name.setText(profile.getString("user"));
             location.setText(profile.getString("location"));
+            bio.setText(profile.getString("bio"));
             following.setText(profile.getString("following_count"));
             followers.setText(profile.getString("followers_count"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public interface OnProfileFragmentSelected{
+        void onProfileFragmentDisplayed(boolean mine);
     }
 }

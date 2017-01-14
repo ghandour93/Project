@@ -1,9 +1,11 @@
 package com.example.ramy.wayfare;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,6 +24,9 @@ public class FeedFragment extends Fragment {
     SwipeRefreshLayout swipeRefreshLayout;
     RecyclerView rv;
     View rootView;
+    FloatingActionButton fab_post;
+    FloatingActionButton fab_text;
+    FloatingActionButton fab_image;
     ArrayList<JSONObject> arraylist;
     Bundle b;
     String username;
@@ -67,6 +72,13 @@ public class FeedFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (getParentFragment() == null)
+            ((OnFeedFragmentSelected)getActivity()).onFeedFragmentDisplayed();
     }
 
     public void showLoading(){
@@ -120,6 +132,10 @@ public class FeedFragment extends Fragment {
                 return null;
             }
         }.execute();
+    }
+
+    public interface OnFeedFragmentSelected{
+        void onFeedFragmentDisplayed();
     }
 
 }

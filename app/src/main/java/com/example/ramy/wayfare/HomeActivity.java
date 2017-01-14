@@ -41,23 +41,25 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 import static android.provider.UserDictionary.Words.APP_ID;
-import static com.example.ramy.wayfare.R.id.textView;
 
-public class HomeActivity extends AppCompatActivity{
+public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFeedFragmentSelected,
+        ProfileFragment.OnProfileFragmentSelected, NotificationsFragment.OnNotificationsFragmentSelected{
 
     String auth_token;
     Bundle bndl;
     PopupWindow popupWindow;
     boolean isFABOpen;
-    FloatingActionButton fab_post;
-    FloatingActionButton fab_text;
-    FloatingActionButton fab_image;
+    FloatingActionButton fab_main;
+    FloatingActionButton fab_btn1;
+    FloatingActionButton fab_btn2;
+    FloatingActionButton fab_btn3;
     PostTextFragment dialogFragment;
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 3;
     boolean gps_enabled;
-    boolean network_enabled;
+    boolean mine;
     BroadcastReceiver broadcastReceiver;
     BroadcastReceiver broadcastReceiverstate;
+    int numFABs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +69,10 @@ public class HomeActivity extends AppCompatActivity{
         bndl = new Bundle();
         isLocationEnabled();
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-        fab_post = (FloatingActionButton) findViewById(R.id.fab_post);
-        fab_text = (FloatingActionButton) findViewById(R.id.fab_text);
-        fab_image = (FloatingActionButton) findViewById(R.id.fab_image);
+        fab_main = (FloatingActionButton) findViewById(R.id.fab_main);
+        fab_btn1 = (FloatingActionButton) findViewById(R.id.fab_btn1);
+        fab_btn2 = (FloatingActionButton) findViewById(R.id.fab_btn2);
+        fab_btn3 = (FloatingActionButton) findViewById(R.id.fab_btn3);
 
         new AsyncTask<String, Void, Intent>() {
             @Override
@@ -112,7 +115,7 @@ public class HomeActivity extends AppCompatActivity{
                         return true;
                     }
                 });
-        fab_post.setOnClickListener(new View.OnClickListener() {
+        fab_main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!isFABOpen) {
@@ -120,26 +123,6 @@ public class HomeActivity extends AppCompatActivity{
                 } else {
                     closeFABMenu();
                 }
-            }
-        });
-        fab_text.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle b = new Bundle();
-                b.putString("token", getToken());
-                b.putBundle("bundle", bndl);
-                dialogFragment = new PostTextFragment();
-                dialogFragment.setArguments(b);
-                dialogFragment.show(getSupportFragmentManager(), "");
-                closeFABMenu();
-            }
-        });
-
-        fab_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, PostImageActivity.class);
-                startActivity(intent);
             }
         });
 
@@ -167,14 +150,28 @@ public class HomeActivity extends AppCompatActivity{
 
     private void showFABMenu(){
         isFABOpen=true;
-        fab_text.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
-        fab_image.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+        float dim = -getResources().getDimension(R.dimen.standard_55);
+        if (numFABs == 2){
+            fab_btn1.animate().translationY((float)(dim*Math.sin(Math.toRadians(15))));
+            fab_btn1.animate().translationX((float)(dim*Math.cos(Math.toRadians(15))));
+            fab_btn2.animate().translationY((float)(dim*Math.cos(Math.toRadians(15))));
+            fab_btn2.animate().translationX((float)(dim*Math.sin(Math.toRadians(15))));
+        }else if (numFABs == 3){
+            fab_btn1.animate().translationX(dim);
+            fab_btn2.animate().translationY((float)(dim*Math.cos(Math.toRadians(45))));
+            fab_btn2.animate().translationX((float)(dim*Math.sin(Math.toRadians(45))));
+            fab_btn3.animate().translationY(dim);
+        }
     }
 
     private void closeFABMenu(){
         isFABOpen=false;
-        fab_text.animate().translationY(0);
-        fab_image.animate().translationY(0);
+        fab_btn1.animate().translationY(0);
+        fab_btn1.animate().translationX(0);
+        fab_btn2.animate().translationY(0);
+        fab_btn2.animate().translationX(0);
+        fab_btn3.animate().translationY(0);
+        fab_btn3.animate().translationX(0);
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
@@ -212,8 +209,6 @@ public class HomeActivity extends AppCompatActivity{
     @Override
     protected void onResume(){
         super.onResume();
-//        Intent intent = new Intent(HomeActivity.this, GpsService.class);
-//        startService(intent);
         if (broadcastReceiver == null){
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
@@ -232,19 +227,7 @@ public class HomeActivity extends AppCompatActivity{
                 }
             };
         }
-
-//        registerReceiver(broadcastReceiver, new IntentFilter("location update"));
-//        registerReceiver(broadcastReceiverstate, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
     }
-
-//    @Override
-////    protected void onPause(){
-////        super.onPause();
-////        Intent intent = new Intent(HomeActivity.this, GpsService.class);
-////        stopService(intent);
-////        unregisterReceiver(broadcastReceiver);
-////        unregisterReceiver(broadcastReceiverstate);
-//    }
 
     @Override
     public void onBackPressed() {
@@ -288,5 +271,63 @@ public class HomeActivity extends AppCompatActivity{
             });
             dialog.show();
         }
+    }
+
+    @Override
+    public void onFeedFragmentDisplayed() {
+        numFABs = 2;
+        fab_main.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_launcher));
+        fab_btn1.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_posttext));
+        fab_btn2.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_postimage));
+        fab_btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle b = new Bundle();
+                b.putString("token", getToken());
+                b.putBundle("bundle", bndl);
+                dialogFragment = new PostTextFragment();
+                dialogFragment.setArguments(b);
+                dialogFragment.show(getSupportFragmentManager(), "");
+                closeFABMenu();
+            }
+        });
+
+        fab_btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, PostImageActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public void onProfileFragmentDisplayed(boolean mine) {
+        numFABs = 3;
+        fab_main.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_launcher));
+        fab_btn3.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_edit));
+        fab_btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment = null;
+                Class fragmentClass = EditProfileFragment.class;
+                try {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.relative_lay, fragment).addToBackStack(null);
+                fragmentTransaction.commit();
+                fragmentTransaction.addToBackStack(null);
+            }
+        });
+    }
+
+    @Override
+    public void onNotificationsFragmentDisplayed() {
+        numFABs = 1;
+        fab_main.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_delete));
     }
 }

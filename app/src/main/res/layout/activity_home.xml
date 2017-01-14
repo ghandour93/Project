@@ -10,33 +10,44 @@
     android:layout_height="match_parent"
     android:layout_above="@+id/bottom_navigation"
     android:id="@+id/relative_lay"/>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_text"
-        android:src="@drawable/ic_launcher"
+<android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_btn1"
         app:fabSize="mini"
+    android:tint="@android:color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom_navigation"
         android:layout_alignEnd="@+id/bottom_navigation"
         android:layout_margin="24dp" />
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_image"
-        android:src="@drawable/ic_launcher"
+        android:id="@+id/fab_btn2"
         app:fabSize="mini"
+        android:tint="@android:color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom_navigation"
         android:layout_alignEnd="@+id/bottom_navigation"
         android:layout_margin="24dp" />
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_post"
+        android:id="@+id/fab_btn3"
+        app:fabSize="mini"
+        android:tint="@android:color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_navigation"
+        android:layout_alignEnd="@+id/bottom_navigation"
+        android:layout_margin="24dp" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_main"
         android:src="@drawable/ic_launcher"
         app:fabSize="normal"
+        android:tint="@android:color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom_navigation"
         android:layout_alignEnd="@+id/bottom_navigation"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp" >
+    </android.support.design.widget.FloatingActionButton>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation"

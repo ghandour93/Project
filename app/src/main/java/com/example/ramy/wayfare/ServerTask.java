@@ -51,6 +51,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     private String addRegId_url = "http://10.0.2.2:8000/final/addRegId/";
     private String postText_url = "http://10.0.2.2:8000/final/postText/";
     private String editFollow_url = "http://10.0.2.2:8000/final/editFollow/";
+    private String editProfile_url = "http://10.0.2.2:8000/final/editProfile/";
     private String notifications_url = "http://10.0.2.2:8000/final/Notifications/";
     String result="";
     public String auth_token="";
@@ -129,11 +130,6 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return null;
     }
 
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);
-    }
-
     public HttpURLConnection setupConnection(URL url, String method, Boolean auth){
         HttpURLConnection httpURLConnection = null;
         try {
@@ -154,7 +150,6 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return httpURLConnection;
     }
 
-
     public String getResult(HttpURLConnection httpURLConnection){
         InputStream inputStream = null;
         String result = "";
@@ -173,12 +168,11 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return result;
     }
 
-	public String UserSignIn(String username, String password)
-	{
+	public String UserSignIn(String email, String password) {
 	    try{	 URL url = new URL(login_url);
                     HttpURLConnection httpURLConnection = setupConnection(url, "POST", false);
                     JSONObject user = new JSONObject();
-                    user.put("email", username);
+                    user.put("email", email);
                     user.put("password", password);
 
                     OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
@@ -203,8 +197,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return null;
 	}
 
-	public String UserSignUp(String email, String username, String password)
-	{
+	public String UserSignUp(String email, String username, String password) {
 		try{  URL url = new URL(user_url);
                     HttpURLConnection httpURLConnection = setupConnection(url, "POST", false);
                     JSONObject user = new JSONObject();
@@ -230,8 +223,37 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     return null;
 	}
 
-    public boolean postText(String text, Location location)
-    {
+    public boolean editProfile(String name, String username, String bio){
+        try{
+            URL url = new URL(editProfile_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
+            JSONObject user = new JSONObject();
+            user.put("name", name);
+            user.put("username", username);
+            user.put("bio", bio);
+
+            OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+            wr.write(user.toString());
+            wr.flush();
+
+            result = getResult(httpURLConnection);
+
+            httpURLConnection.disconnect();
+
+            if (result.equals("success"))
+                return true;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean postText(String text, Location location) {
         try{
             Log.d("ramy","task");
             JSONObject user = new JSONObject();
@@ -240,9 +262,6 @@ public class ServerTask extends AsyncTask<String,Void,String> {
 //                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
 //                String cityName = addresses.get(0).getAddressLine(0);
 //                String countryName = addresses.get(0).getAddressLine(1);
-                Log.d("ramy","task");
-                Log.d("ramy",String.valueOf(location.getLongitude()));
-                Log.d("ramy",String.valueOf(location.getLongitude()));
 
 //                Log.d("city", cityName);
 //                Log.d("country", countryName);
@@ -323,8 +342,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return null;
     }
 
-    public JSONObject getProfile(String username, String method)
-    {
+    public JSONObject getProfile(String username, String method) {
         try{
             URL url = new URL(profile_url);
             HttpURLConnection httpURLConnection = setupConnection(url, method, true);
@@ -412,7 +430,6 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         }
         return null;
     }
-
 
     public void addRegId(String reg_id_new, String reg_id_old) {
         try {

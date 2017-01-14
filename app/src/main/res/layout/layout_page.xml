@@ -71,7 +71,6 @@
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
-        app:srcCompat="@drawable/images"
         android:visibility="invisible"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
