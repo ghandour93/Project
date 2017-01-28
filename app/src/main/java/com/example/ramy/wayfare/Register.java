@@ -275,6 +275,7 @@ public class Register extends AppCompatActivity {
                         if (!getPassword().equals(getPasswordRepeat()))
                         {
                             Toast.makeText(getApplicationContext(), "Password Do not match", Toast.LENGTH_LONG ).show();
+                            return;
                         }
                         new AsyncTask<String, Void, Intent>() {
 
