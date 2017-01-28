@@ -5,6 +5,7 @@ import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +41,7 @@ public class Login extends AccountAuthenticatorActivity {
     public static String userName;
     private String mAuthTokenType;
 
+    SharedPreferences sharedpreferences;
     /**
      * Called when the activity is first created.
      */
@@ -83,6 +85,7 @@ public class Login extends AccountAuthenticatorActivity {
 
         // The sign up activity returned that the user has successfully created an account
         if (requestCode == REQ_SIGNUP && resultCode == RESULT_OK) {
+            Log.e("finish finish", "login");
             finishLogin(data);
         } else
             super.onActivityResult(requestCode, resultCode, data);
@@ -164,6 +167,11 @@ public class Login extends AccountAuthenticatorActivity {
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
         Log.d("udinic", TAG + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
+
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("accountName", accountName);
+        editor.commit();
+
         boolean available = checkAccount();
         Log.e("Check Account", available+"");
         if (!available) {
