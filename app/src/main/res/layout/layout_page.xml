@@ -24,11 +24,23 @@
         android:background="@drawable/my_textfield"
         android:visibility="invisible"
         android:ems="10"
-        android:layout_below="@+id/username"
-        android:layout_alignLeft="@+id/username"
-        android:layout_alignStart="@+id/username"
+        android:layout_below="@+id/password"
+        android:layout_alignLeft="@+id/password"
+        android:layout_alignStart="@+id/password"
         android:layout_marginTop="71dp"
         android:id="@+id/RepeatPass" />
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:background="@drawable/my_textfield"
+        android:visibility="invisible"
+        android:ems="10"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="71dp"
+        android:id="@+id/password" />
+
     
 
     <TextView
@@ -39,7 +51,7 @@
         android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/username"
+        android:layout_alignTop="@+id/password"
         android:layout_centerHorizontal="true"
         android:id="@+id/pass" />
 
@@ -51,7 +63,7 @@
         android:textSize="15sp"
         android:fontFamily="sans-serif-medium"
         android:visibility="invisible"
-        android:layout_alignBottom="@+id/RepeatPass"
+        android:layout_alignTop="@+id/RepeatPass"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="22dp"
         android:id="@+id/repeat" />
@@ -65,6 +77,18 @@
         android:text="Name"
         android:ems="10"
         android:id="@+id/username"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:background="@drawable/my_textfield"
+        android:visibility="invisible"
+        android:text="Name"
+        android:ems="10"
+        android:id="@+id/email"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
