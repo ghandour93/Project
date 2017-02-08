@@ -146,38 +146,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         c = getArguments();
         if (c != null)
             bool = c.containsKey("notmine");
-        new ServerTask(getActivity(),((HomeActivity)getActivity()).getToken()){
-
-            @Override
-            protected String doInBackground(String... params) {
-                try {
-                    if (bool) {
-                        profile = getProfile(c.getString("userprofile"), "POST");
-                    } else {
-                        profile = getProfile("", "GET");
-                    }
-                    publishProgress();
-
-                } catch (Exception e) {
-
-                }
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(Void... values) {
-                loadProfileData();
-                try {
-                    viewPager.setAdapter(new ProfileAdapter(getChildFragmentManager(), profile.getString("user")));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                viewPager.setCurrentItem(0);
-                tabLayout.setupWithViewPager(viewPager);
-                viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-                super.onProgressUpdate(values);
-            }
-        }.execute();
 
         following.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,10 +194,46 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     @Override
     public void onResume(){
         super.onResume();
-        if (bool)
-            ((OnProfileFragmentSelected)getActivity()).onProfileFragmentDisplayed(false);
-        else
-            ((OnProfileFragmentSelected)getActivity()).onProfileFragmentDisplayed(true);
+        new ServerTask(getActivity(),((HomeActivity)getActivity()).getToken()){
+
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+                    if (bool) {
+                        profile = getProfile(c.getString("userprofile"), "POST");
+                    } else {
+                        profile = getProfile("", "GET");
+                    }
+                    publishProgress();
+
+                } catch (Exception e) {
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Void... values) {
+                loadProfileData();
+                try {
+                    viewPager.setAdapter(new ProfileAdapter(getChildFragmentManager(), profile.getString("user")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                viewPager.setCurrentItem(0);
+                tabLayout.setupWithViewPager(viewPager);
+                viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+                if (bool)
+                    try {
+                        ((OnProfileFragmentSelected)getActivity()).onProfileFragmentDisplayed(false, profile.getInt("type_rel"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                else
+                    ((OnProfileFragmentSelected)getActivity()).onProfileFragmentDisplayed(true, 0);
+                super.onProgressUpdate(values);
+            }
+        }.execute();
     }
 
     @Override
@@ -248,7 +252,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             }
         });
     }
-
 
     private void ScaleText(TextView textView1, TextView textView2, float percentage) {
         if (percentage >= PERCENTAGE_TO_HIDE_TITLE_DETAILS) {
@@ -382,6 +385,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     }
 
     public interface OnProfileFragmentSelected{
-        void onProfileFragmentDisplayed(boolean mine);
+        void onProfileFragmentDisplayed(boolean mine, int rel);
     }
 }

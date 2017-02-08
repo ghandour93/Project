@@ -20,24 +20,25 @@ public class NotificationsListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
-        if(message!= null){
-            Log.d("ro", "message received");
+        Log.d("message","yes");
             sendNotification(data);
-//            sendNotification(new RemoteNotification(data));
-        }
     }
 
     private void sendNotification(Bundle data) {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (data.getString("type").equals("like"))
+            intent.putExtra("post_id", data.getString("post_id"));
+        else
+            intent.putExtra("profile", data.getString("profile"));
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("WayFare")
-                .setContentText(data.getString("message"))
+                .setContentText("bae")
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 

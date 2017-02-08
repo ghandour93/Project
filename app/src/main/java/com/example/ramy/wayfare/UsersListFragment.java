@@ -61,8 +61,13 @@ public class UsersListFragment extends Fragment {
             @Override
             protected String doInBackground(String... params) {
                 try {
-
-                    obj=getProfiles(getArguments().getInt("id"), getArguments().getString("username"), "POST");
+                    if (getArguments().containsKey("post_id")) {
+                        obj = getProfiles(getArguments().getInt("id"), getArguments().getString("username"),
+                                getArguments().getInt("post_id"), "POST");
+                    }else{
+                        obj = getProfiles(getArguments().getInt("id"), getArguments().getString("username"),
+                                0, "POST");
+                    }
                     for (int i = 0; i < obj.length(); i++) {
                         arrayList.add(obj.getJSONObject(i));
                     }

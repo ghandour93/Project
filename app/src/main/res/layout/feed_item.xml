@@ -2,20 +2,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:id="@+id/relative_lay">
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        card_view:cardCornerRadius="10dp"
-        card_view:cardElevation="5dp"
-        card_view:cardUseCompatPadding="true">
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:cardUseCompatPadding="true"
+        android:layout_height="450dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <Button
+                android:text="Vote Up"
+                android:layout_width="185dp"
+                android:layout_below="@+id/pic2"
+                android:id="@+id/btn_like"
+                android:layout_height="40dp"
+                style="@android:style/Widget.Button" />
 
             <ImageView
                 android:id="@+id/iv_image"
@@ -53,60 +63,50 @@
                 android:layout_alignBottom="@+id/tv_username" />
 
             <TextView
-                android:text="Likes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_alignParentBottom="true"
-                android:layout_toStartOf="@+id/time"
-                android:layout_marginEnd="50dp"
-                android:id="@+id/textView" />
-
-            <TextView
-                android:text="Shares"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_alignParentBottom="true"
-                android:layout_toStartOf="@+id/time"
-                android:layout_marginEnd="-25dp"
-                android:id="@+id/textView2" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@mipmap/ic_launcher"
-                android:layout_alignParentBottom="true"
-                android:layout_alignTop="@+id/textView"
-                android:layout_toStartOf="@+id/textView"
-                android:id="@+id/imageView" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@mipmap/ic_launcher"
-                android:layout_alignParentBottom="true"
-                android:id="@+id/imageView2"
-                android:layout_alignTop="@+id/textView2"
-                android:layout_toStartOf="@+id/textView2"/>
-
-            <TextView
                 android:text="TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
                 android:textColor="@android:color/holo_orange_dark"
                 android:textSize="50sp"
+                android:gravity="center"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:id="@+id/textView3" />
+                android:id="@+id/textView3"
+                android:textAlignment="center" />
+
+            <Button
+                android:text="Vote Down"
+                android:layout_width="185dp"
+                android:id="@+id/btn_dislike"
+                android:layout_height="40dp"
+                style="@android:style/Widget.Button"
+                android:layout_alignBottom="@+id/btn_like"
+                android:layout_alignParentEnd="true" />
 
             <ImageView
                 android:layout_width="fill_parent"
                 android:layout_height="300dp"
                 android:src="@mipmap/ic_launcher"
                 android:id="@+id/pic2"
-                android:layout_above="@+id/textView"
+                android:layout_centerVertical="true"
                 android:layout_alignParentStart="true" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_like"
+                android:layout_alignEnd="@+id/tv_location"
+                android:id="@+id/tv_like" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="34dp"
+                android:id="@+id/tv_dislike"
+                android:layout_below="@+id/btn_dislike"
+                android:layout_toStartOf="@+id/time" />
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

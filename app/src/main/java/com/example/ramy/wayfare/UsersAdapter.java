@@ -1,6 +1,7 @@
 package com.example.ramy.wayfare;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,10 +20,18 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class UsersAdapter extends ArrayAdapter<JSONObject>{
+    TextView tv_username;
+    Button btn_follow;
+    SimpleDraweeView avatar;
+
     List<JSONObject> objs;
-    boolean success;
+    JSONObject obj;
+    String rel;
     String username;
+    String auth_token;
     View v;
     Context ctx;
 
@@ -34,7 +43,7 @@ public class UsersAdapter extends ArrayAdapter<JSONObject>{
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         v = convertView;
 
         if (v == null) {
@@ -42,16 +51,16 @@ public class UsersAdapter extends ArrayAdapter<JSONObject>{
             vi = LayoutInflater.from(getContext());
             v = vi.inflate(R.layout.user_item, null);
         }
-        final TextView tv_username = (TextView) v.findViewById(R.id.tv_username);
-        final Button btn_follow = (Button) v.findViewById(R.id.btn_follow);
-        SimpleDraweeView avatar = (SimpleDraweeView) v.findViewById(R.id.avatar);
+        tv_username = (TextView) v.findViewById(R.id.tv_username);
+        btn_follow = (Button) v.findViewById(R.id.btn_follow);
+        avatar = (SimpleDraweeView) v.findViewById(R.id.avatar);
 
         if(objs.isEmpty() || position == objs.size()-1){
             v.findViewById(R.id.relative_lay).setVisibility(View.GONE);
             return v;
         }
 
-        JSONObject obj = getItem(position);
+        obj = getItem(position);
 
         if (obj != null ) {
                 try {
@@ -80,16 +89,17 @@ public class UsersAdapter extends ArrayAdapter<JSONObject>{
         btn_follow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                username=tv_username.getText().toString();
                 try {
-                    new ServerTask(ctx,objs.get(objs.size()-1).getString("token")){
+                    SharedPreferences prefs = ctx.getSharedPreferences("WayFare", MODE_PRIVATE);
+                    auth_token = prefs.getString("auth_token", null);
+                    username=getItem(position).getString("user");
+                    new ServerTask(ctx,auth_token){
                         @Override
                         protected String doInBackground(String... params) {
                             try {
 
-                                success=editFollow(username);
-                                if (success)
-                                    publishProgress();
+                                rel=editFollow(username);
+                                publishProgress();
 
                             } catch (Exception e) {
 
@@ -99,11 +109,11 @@ public class UsersAdapter extends ArrayAdapter<JSONObject>{
 
                         @Override
                         protected void onProgressUpdate(Void... values) {
-                            if (v!=null)
-                            if (btn_follow.getText().toString().equals("Follow")){
-                                btn_follow.setText("Following");
-                            }else if (btn_follow.getText().toString().equals("Following")){
-                                btn_follow.setText("Follow");
+                            try {
+                                getItem(position).put("type_rel", rel);
+                                notifyDataSetChanged();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
                             super.onProgressUpdate(values);
                         }
@@ -116,5 +126,18 @@ public class UsersAdapter extends ArrayAdapter<JSONObject>{
 
         return v;
     }
+
+    @Override
+    public int getViewTypeCount() {
+
+        return 1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
+    }
+
     }
 

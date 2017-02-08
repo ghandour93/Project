@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -79,12 +81,31 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
             protected Intent doInBackground(String... params) {
                 try {
                     auth_token = ServerTask.getAuthToken(Login.mAccountManager, Login.accountName);
+                    SharedPreferences prefs = getSharedPreferences("WayFare", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("auth_token", auth_token);
+                    editor.apply();
                     Fragment fragment = null;
-                    Class fragmentClass = FeedFragment.class;
-                    try {
+                    Class fragmentClass;
+                    Bundle b = new Bundle();
+                    if(getIntent().getStringExtra("profile") != null){
+                        fragmentClass = ProfileFragment.class;
                         fragment = (Fragment) fragmentClass.newInstance();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        b.putString("userprofile", getIntent().getStringExtra("profile"));
+                        b.putBoolean("notmine", true);
+                        fragment.setArguments(b);
+                    }else {
+                        fragmentClass = FeedFragment.class;
+                        try {
+                            fragment = (Fragment) fragmentClass.newInstance();
+                            if (getIntent().getStringExtra("post_id") != null) {
+                                Log.d("jj", "bh");
+                                b.putInt("post_id", Integer.parseInt(getIntent().getStringExtra("post_id")));
+                                fragment.setArguments(b);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -235,6 +256,9 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
             dialogFragment.dismiss();
             return;
         }
+        if (isFABOpen){
+            closeFABMenu();
+        }
         if(getFragmentManager().getBackStackEntryCount() == 1) {
             moveTaskToBack(false);
         }
@@ -302,32 +326,66 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
     }
 
     @Override
-    public void onProfileFragmentDisplayed(boolean mine) {
+    public void onProfileFragmentDisplayed(boolean mine, int rel) {
         numFABs = 3;
-        fab_main.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_launcher));
-        fab_btn3.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_edit));
-        fab_btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = null;
-                Class fragmentClass = EditProfileFragment.class;
-                try {
-                    fragment = (Fragment) fragmentClass.newInstance();
-                } catch (Exception e) {
-                    e.printStackTrace();
+        if (!mine){
+            Log.d("rel", String.valueOf(rel));
+        }else {
+            fab_main.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_launcher));
+            fab_btn3.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_edit));
+            fab_btn3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Fragment fragment = null;
+                    Class fragmentClass = EditProfileFragment.class;
+                    try {
+                        fragment = (Fragment) fragmentClass.newInstance();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.relative_lay, fragment).addToBackStack(null);
+                    fragmentTransaction.commit();
+                    fragmentTransaction.addToBackStack(null);
                 }
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.relative_lay, fragment).addToBackStack(null);
-                fragmentTransaction.commit();
-                fragmentTransaction.addToBackStack(null);
-            }
-        });
+            });
+        }
     }
 
     @Override
     public void onNotificationsFragmentDisplayed() {
         numFABs = 1;
         fab_main.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_delete));
+    }
+
+    private boolean isGooglePlayServicesAvailable() {
+
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+
+        int resultCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+
+            if (googleApiAvailability.isUserResolvableError(resultCode)) {
+
+                googleApiAvailability.getErrorDialog(this, resultCode, 10)
+
+                        .show();
+
+            } else {
+
+                Toast.makeText(HomeActivity.this, "Unsupported Device", Toast.LENGTH_SHORT).show();
+
+                finish();
+
+            }
+
+            return false;
+
+        }
+
+        return true;
+
     }
 }

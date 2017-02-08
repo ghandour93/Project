@@ -51,6 +51,9 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     private String addRegId_url = "http://10.0.2.2:8000/final/addRegId/";
     private String postText_url = "http://10.0.2.2:8000/final/postText/";
     private String editFollow_url = "http://10.0.2.2:8000/final/editFollow/";
+    private String editLike_url = "http://10.0.2.2:8000/final/editLike/";
+    private String getLikes_url = "http://10.0.2.2:8000/final/getLikes/";
+    private String getPost_url = "http://10.0.2.2:8000/final/getPost/";
     private String editProfile_url = "http://10.0.2.2:8000/final/editProfile/";
     private String notifications_url = "http://10.0.2.2:8000/final/Notifications/";
     String result="";
@@ -294,7 +297,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return false;
     }
 
-    public boolean editFollow(String username) {
+    public String editFollow(String username) {
         try{
             URL url = new URL(editFollow_url);
             HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
@@ -304,6 +307,34 @@ public class ServerTask extends AsyncTask<String,Void,String> {
                 OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
                 wr.write(user.toString());
                 wr.flush();
+
+            result = getResult(httpURLConnection);
+
+            httpURLConnection.disconnect();
+
+            return result;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean editLike(String username, int postId) {
+        try{
+            URL url = new URL(editLike_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
+            JSONObject user = new JSONObject();
+            user.put("username", username);
+            user.put("post_id", postId);
+
+            OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+            wr.write(user.toString());
+            wr.flush();
 
             result = getResult(httpURLConnection);
 
@@ -320,6 +351,61 @@ public class ServerTask extends AsyncTask<String,Void,String> {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public JSONObject getLikes(String username, int postId) {
+        try{
+            URL url = new URL(getLikes_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
+            JSONObject user = new JSONObject();
+            user.put("username", username);
+            user.put("post_id", postId);
+
+            OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+            wr.write(user.toString());
+            wr.flush();
+
+            result = getResult(httpURLConnection);
+
+            httpURLConnection.disconnect();
+
+            return new JSONObject(result);
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public JSONArray getPost(int postId) {
+        try{
+            URL url = new URL(getPost_url);
+            HttpURLConnection httpURLConnection = setupConnection(url, "POST", true);
+            JSONObject user = new JSONObject();
+            user.put("post_id", postId);
+
+            OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+            wr.write(user.toString());
+            wr.flush();
+
+            result = getResult(httpURLConnection);
+
+            httpURLConnection.disconnect();
+
+            return new JSONArray().put(new JSONObject(result));
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public JSONArray getNotifications(String username, String method){
@@ -370,7 +456,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         return null;
     }
 
-    public JSONArray getProfiles(int id, String username, String method){
+    public JSONArray getProfiles(int id, String username, int postId, String method){
         try {
             URL url = new URL(profiles_url);
             HttpURLConnection httpURLConnection = setupConnection(url, method, true);
@@ -378,6 +464,7 @@ public class ServerTask extends AsyncTask<String,Void,String> {
                 JSONObject user = new JSONObject();
                 user.put("id", id);
                 user.put("username", username);
+                user.put("post_id", postId);
 
                 OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
                 wr.write(user.toString());

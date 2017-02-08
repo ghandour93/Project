@@ -9,14 +9,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class NotificationsFragment extends Fragment {
 
-    JSONArray not;
-    ArrayList<String> notifications;
+    JSONArray obj = new JSONArray();
+    ArrayList<JSONObject> arrayList = new ArrayList<>();
     View rootView;
+    ListView listView;
 
     public NotificationsFragment() {
         // Required empty public constructor
@@ -31,8 +33,9 @@ public class NotificationsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_notifications, container, false);
-        final ListView listView = (ListView) rootView.findViewById(R.id.listview);
-        not=new JSONArray();
+        listView = (ListView) rootView.findViewById(R.id.listview);
+        final NotificationsAdapter adapter = new NotificationsAdapter(getActivity(), R.layout.notification_item, arrayList);
+        listView.setAdapter(adapter);
 
         new ServerTask(getActivity(),((HomeActivity)getActivity()).getToken()){
 
@@ -49,10 +52,9 @@ public class NotificationsFragment extends Fragment {
             @Override
             protected String doInBackground(String... params) {
                 try {
-                    not = getNotifications("", "GET");
-                    notifications = new ArrayList<>(not.length());
-                    for (int i = 0; i < not.length(); i++) {
-                        notifications.add(not.getJSONObject(i).getString("message"));
+                    obj = getNotifications("", "GET");
+                    for (int i = 0; i < obj.length(); i++) {
+                        arrayList.add(obj.getJSONObject(i));
                     }
                     publishProgress();
                 } catch (Exception e) {
@@ -63,8 +65,7 @@ public class NotificationsFragment extends Fragment {
 
             @Override
             protected void onProgressUpdate(Void... values) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, notifications);
-                listView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
                 super.onProgressUpdate(values);
             }
         }.execute();
@@ -76,6 +77,7 @@ public class NotificationsFragment extends Fragment {
     public void onResume(){
         super.onResume();
         ((OnNotificationsFragmentSelected)getActivity()).onNotificationsFragmentDisplayed();
+        arrayList.clear();
     }
 
     public void showLoading(){
