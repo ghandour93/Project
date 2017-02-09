@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -33,8 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 
@@ -542,19 +539,20 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         }
     }
 
-    public static Account getStoredAccount(String c) { //send ApplicationContext as a parameter
+    public static Account getStoredAccount(String c, AccountManager acc) { //send ApplicationContext as a parameter
+
         Account[] accounts = null;
         String accountname = c;
-        AccountManager accountManager = AccountManager.get(context);
         Account account = null;
         if(accountname != null) {
             try {
-            accounts = accountManager.getAccountsByType("com.example.ramy.wayfare");
+            accounts = acc.getAccountsByType("com.example.ramy.wayfare");
             } catch (SecurityException e) {
                 Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
             }
             for(Account a : accounts) {
                 if(a.name.toString().equalsIgnoreCase(accountname)) {
+                    Log.e("test", a.toString());
                     account = a;
                 }
             }
@@ -564,11 +562,12 @@ public class ServerTask extends AsyncTask<String,Void,String> {
 
     public static String getAuthToken(AccountManager a, String c) {
         final AccountManager accountManager = a;
-        AccountManagerFuture<Bundle> future = accountManager.getAuthToken(getStoredAccount(c),
+        AccountManagerFuture<Bundle> future = accountManager.getAuthToken(getStoredAccount(c, a),
                 AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, true, null, null);
         Bundle result = null;
         try {
             result = future.getResult();
+
         } catch (Exception e) {
             Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
             toast.show();
@@ -576,14 +575,15 @@ public class ServerTask extends AsyncTask<String,Void,String> {
         String authToken = null;
         if (future.isDone() && !future.isCancelled()) {
             if (result.containsKey(AccountManager.KEY_INTENT)) {
+                Log.e("test", "7");
                 Intent intent = result.getParcelable(AccountManager.KEY_INTENT);
             }
             authToken = result.getString(AccountManager.KEY_AUTHTOKEN);
         }
-        if (authToken == null) {
-            Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
-            toast.show();
-        }
+//        if (authToken == null) {
+//            Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
+//            toast.show();
+//        }
 
         return authToken;
     }

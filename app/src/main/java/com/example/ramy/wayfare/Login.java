@@ -48,36 +48,48 @@ public class Login extends AccountAuthenticatorActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        mAccountManager = AccountManager.get(getBaseContext());
-
-        String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
-        Log.d("udinic", TAG + accountName);
-
-        mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
-        if (mAuthTokenType == null)
-            mAuthTokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
-
-        if (accountName != null) {
-            ((EditText)findViewById(R.id.accountName)).setText(accountName);
+        if (SavedPreference.getUserName(getApplicationContext()).length() != 0) {
+            Log.e("yahia testing123", "login auto");
+            mAccountManager = AccountManager.get(getBaseContext());
+            Intent login = new Intent(Login.this, HomeActivity.class);
+            finish();
+            Log.e("yahia testing123", "go to login");
+            startActivity(login);
+            Log.e("yahia testing123", "shouldnt be here");
         }
+        else {
+            setContentView(R.layout.activity_login);
+            mAccountManager = AccountManager.get(getBaseContext());
+//            sharedpreferences = PreferenceManager
+//                    .getDefaultSharedPreferences(this);
+            String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
+            Log.d("udinic", TAG + accountName);
 
-        findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submit();
+            mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
+            if (mAuthTokenType == null)
+                mAuthTokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
+
+            if (accountName != null) {
+                ((EditText) findViewById(R.id.accountName)).setText(accountName);
             }
-        });
-        findViewById(R.id.signUp).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Since there can only be one AuthenticatorActivity, we call the sign up activity, get his results,
-                // and return them in setAccountAuthenticatorResult(). See finishLogin().
-                Intent signup = new Intent(getBaseContext(), Register.class);
+
+            findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    submit();
+                }
+            });
+            findViewById(R.id.signUp).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Since there can only be one AuthenticatorActivity, we call the sign up activity, get his results,
+                    // and return them in setAccountAuthenticatorResult(). See finishLogin().
+                    Intent signup = new Intent(getBaseContext(), Register.class);
 //                signup.putExtras(getIntent().getExtras());
-                startActivityForResult(signup, REQ_SIGNUP);
-            }
-        });
+                    startActivityForResult(signup, REQ_SIGNUP);
+                }
+            });
+        }
     }
 
     @Override
@@ -168,9 +180,7 @@ public class Login extends AccountAuthenticatorActivity {
         Log.d("udinic", TAG + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
 
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putString("accountName", accountName);
-        editor.commit();
+        SavedPreference.setUserName(getApplicationContext(), accountName);
 
         boolean available = checkAccount();
         Log.e("Check Account", available+"");
