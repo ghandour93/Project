@@ -27,8 +27,9 @@ public class NotificationsListenerService extends GcmListenerService {
     private void sendNotification(Bundle data) {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        if (data.getString("type").equals("like"))
+        if (data.getString("type").equals("like")){
             intent.putExtra("post_id", data.getString("post_id"));
+        }
         else
             intent.putExtra("profile", data.getString("profile"));
 

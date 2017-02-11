@@ -48,16 +48,16 @@ public class Login extends AccountAuthenticatorActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (SavedPreference.getUserName(getApplicationContext()).length() != 0) {
-            Log.e("yahia testing123", "login auto");
-            mAccountManager = AccountManager.get(getBaseContext());
-            Intent login = new Intent(Login.this, HomeActivity.class);
-            finish();
-            Log.e("yahia testing123", "go to login");
-            startActivity(login);
-            Log.e("yahia testing123", "shouldnt be here");
-        }
-        else {
+//        if (SavedPreference.getUserName(getApplicationContext()).length() != 0) {
+//            Log.e("yahia testing123", "login auto");
+//            mAccountManager = AccountManager.get(getBaseContext());
+//            Intent login = new Intent(Login.this, HomeActivity.class);
+//            finish();
+//            Log.e("yahia testing123", "go to login");
+//            startActivity(login);
+//            Log.e("yahia testing123", "shouldnt be here");
+//        }
+//        else {
             setContentView(R.layout.activity_login);
             mAccountManager = AccountManager.get(getBaseContext());
 //            sharedpreferences = PreferenceManager
@@ -89,7 +89,7 @@ public class Login extends AccountAuthenticatorActivity {
                     startActivityForResult(signup, REQ_SIGNUP);
                 }
             });
-        }
+//        }
     }
 
     @Override
@@ -201,12 +201,12 @@ public class Login extends AccountAuthenticatorActivity {
             mAccountManager.setPassword(account, accountPassword);
             mAccountManager.setAuthToken(account, authtokenType, authtoken);
         }
-
         setAccountAuthenticatorResult(intent.getExtras());
-        setResult(RESULT_OK, intent);
-
-        Intent i = new Intent(this, HomeActivity.class);
-        startActivity(i);
+        setResult(RESULT_OK);
+        Log.d("ramy","result");
+        finish();
+//        Intent i = new Intent(this, HomeActivity.class);
+//        startActivity(i);
 //        finish();
     }
     public static boolean checkAccount() { //send ApplicationContext as a parameter

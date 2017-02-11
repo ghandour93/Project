@@ -1,10 +1,12 @@
 package com.example.ramy.wayfare;
 
+import android.accounts.AccountManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -45,6 +47,7 @@ import static android.provider.UserDictionary.Words.APP_ID;
 public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFeedFragmentSelected,
         ProfileFragment.OnProfileFragmentSelected, NotificationsFragment.OnNotificationsFragmentSelected{
 
+    public static AccountManager mAccountManager;
     String auth_token;
     Bundle bndl;
     PopupWindow popupWindow;
@@ -55,6 +58,7 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
     FloatingActionButton fab_btn3;
     PostTextFragment dialogFragment;
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 3;
+    private final int REQ_LOGIN = 8;
     boolean gps_enabled;
     boolean mine;
     BroadcastReceiver broadcastReceiver;
@@ -66,6 +70,22 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Fresco.initialize(this);
+        checkLogin();
+    }
+
+    private void checkLogin(){
+        if (SavedPreference.getUserName(getApplicationContext()).length() != 0) {
+
+//            SavedPreference.clear(getApplicationContext());
+            initialize();
+        }
+        else {
+            Intent login = new Intent(getBaseContext(), Login.class);
+            startActivityForResult(login, REQ_LOGIN);
+        }
+    }
+
+    private void initialize(){
         bndl = new Bundle();
         isLocationEnabled();
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
@@ -73,16 +93,36 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
         fab_btn1 = (FloatingActionButton) findViewById(R.id.fab_btn1);
         fab_btn2 = (FloatingActionButton) findViewById(R.id.fab_btn2);
         fab_btn3 = (FloatingActionButton) findViewById(R.id.fab_btn3);
+        Log.e("ramy", "home1");
+        mAccountManager = AccountManager.get(getBaseContext());
 
         new AsyncTask<String, Void, Intent>() {
             @Override
             protected Intent doInBackground(String... params) {
                 try {
-                    auth_token = ServerTask.getAuthToken(Login.mAccountManager, Login.accountName);
+                    String x = SavedPreference.getUserName(getApplicationContext());
+                    auth_token = ServerTask.getAuthToken(mAccountManager, x);
                     Fragment fragment = null;
-                    Class fragmentClass = FeedFragment.class;
+                    Class fragmentClass;
                     try {
+                    if (getIntent().getStringExtra("profile") != null){
+                        fragmentClass = ProfileFragment.class;
                         fragment = (Fragment) fragmentClass.newInstance();
+                        Bundle b = new Bundle();
+                        b.putString("userprofile",getIntent().getStringExtra("profile"));
+                        b.putBoolean("notmine", true);
+                        fragment.setArguments(b);
+                    }else {
+                        fragmentClass = FeedFragment.class;
+                        fragment = (Fragment) fragmentClass.newInstance();
+                        if (getIntent().getStringExtra("post_id") != null){
+                            Log.e("ramy","postid");
+                            Bundle b = new Bundle();
+                            b.putInt("post_id",Integer.parseInt(getIntent().getStringExtra("post_id")));
+                            fragment.setArguments(b);
+                            Log.e("ramy","postid");
+                        }
+                    }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -230,6 +270,18 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("activity","finish0");
+        if (requestCode == REQ_LOGIN && resultCode == RESULT_OK) {
+            Log.d("activity","finish2");
+            initialize();
+            Log.d("activity","finish");
+        } else{
+            super.onActivityResult(requestCode, resultCode, data);
+            Log.d("activity","finish1");}
+    }
+
+    @Override
     public void onBackPressed() {
         if(dialogFragment!=null && dialogFragment.isVisible()){
             dialogFragment.dismiss();
@@ -302,7 +354,7 @@ public class HomeActivity extends AppCompatActivity implements FeedFragment.OnFe
     }
 
     @Override
-    public void onProfileFragmentDisplayed(boolean mine) {
+    public void onProfileFragmentDisplayed(boolean mine, int rel) {
         numFABs = 3;
         fab_main.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_launcher));
         fab_btn3.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_edit));

@@ -540,13 +540,15 @@ public class ServerTask extends AsyncTask<String,Void,String> {
     }
 
     public static Account getStoredAccount(String c, AccountManager acc) { //send ApplicationContext as a parameter
-
+        Log.e("ramy", "result0");
         Account[] accounts = null;
         String accountname = c;
         Account account = null;
         if(accountname != null) {
+            Log.e("ramy", "resultnot");
             try {
             accounts = acc.getAccountsByType("com.example.ramy.wayfare");
+                Log.e("ramy", "result1");
             } catch (SecurityException e) {
                 Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
             }
@@ -557,16 +559,22 @@ public class ServerTask extends AsyncTask<String,Void,String> {
                 }
             }
             }
+        Log.e("ramy", "resultnull");
         return account;
     }
 
     public static String getAuthToken(AccountManager a, String c) {
+        Log.e("ramy", "result4");
         final AccountManager accountManager = a;
+//        String x = SavedPreference.getUserName(context);
+//        Log.e("ramy", x);
         AccountManagerFuture<Bundle> future = accountManager.getAuthToken(getStoredAccount(c, a),
                 AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, true, null, null);
         Bundle result = null;
+        Log.e("ramy", "result");
         try {
             result = future.getResult();
+            Log.e("ramy", "result");
 
         } catch (Exception e) {
             Toast toast = Toast.makeText(context, "problem with authentication", Toast.LENGTH_LONG);
